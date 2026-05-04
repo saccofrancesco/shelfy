@@ -6,10 +6,27 @@ import {
   Chip,
   Box,
   CardMedia,
+  Skeleton,
 } from "@mui/material";
+
+// Soft palette for genre chips — cycles through a small set
+const chipColors = [
+  { bg: "#e8f0fe", color: "#1a73e8" },
+  { bg: "#fce8e6", color: "#c5221f" },
+  { bg: "#e6f4ea", color: "#137333" },
+  { bg: "#fef7e0", color: "#b06000" },
+  { bg: "#f3e8fd", color: "#7b1fa2" },
+];
+
+function hashIndex(str = "", len) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % len;
+  return h;
+}
 
 function BookCard({ book }) {
   const [coverUrl, setCoverUrl] = useState(null);
+  const [coverLoading, setCoverLoading] = useState(true);
 
   useEffect(() => {
     async function fetchCover() {
@@ -18,77 +35,168 @@ function BookCard({ book }) {
           `https://openlibrary.org/search.json?title=${encodeURIComponent(book.title)}`,
         );
         const data = await res.json();
-
-        if (data.docs && data.docs.length > 0) {
-          const coverId = data.docs[0].cover_i;
-
-          if (coverId) {
-            setCoverUrl(`https://covers.openlibrary.org/b/id/${coverId}-L.jpg`);
-          } else {
-            setCoverUrl(null);
-          }
+        if (data.docs?.[0]?.cover_i) {
+          setCoverUrl(
+            `https://covers.openlibrary.org/b/id/${data.docs[0].cover_i}-L.jpg`,
+          );
+        } else {
+          setCoverUrl(null);
         }
-      } catch (err) {
-        console.error(err);
+      } catch {
         setCoverUrl(null);
+      } finally {
+        setCoverLoading(false);
       }
     }
-
     fetchCover();
   }, [book.title]);
 
+  const genreColor = chipColors[hashIndex(book.genre, chipColors.length)];
+
   return (
     <Card
+      elevation={0}
       sx={{
-        maxWidth: 320,
-        borderRadius: 3,
+        borderRadius: "16px",
+        border: "1px solid #e8eaed",
         display: "flex",
         flexDirection: "column",
+        overflow: "hidden",
+        backgroundColor: "#fff",
+        transition: "box-shadow 0.2s, transform 0.2s",
+        "&:hover": {
+          boxShadow: "0 4px 20px rgba(32,33,36,0.12)",
+          transform: "translateY(-2px)",
+        },
       }}
     >
-      {coverUrl ? (
+      {/* Cover area */}
+      {coverLoading ? (
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={220}
+          animation="wave"
+        />
+      ) : coverUrl ? (
         <CardMedia
           component="img"
           image={coverUrl}
           alt={book.title}
           sx={{
             width: "100%",
-            height: "auto",
-            objectFit: "contain",
-            backgroundColor: "#f5f5f5",
+            height: 220,
+            objectFit: "cover",
+            backgroundColor: "#f1f3f4",
           }}
         />
       ) : (
         <Box
           sx={{
-            height: 260,
+            height: 220,
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            bgcolor: "grey.200",
+            bgcolor: "#f1f3f4",
+            gap: 1,
           }}
         >
-          <Typography variant="body2">No cover</Typography>
+          <Typography sx={{ fontSize: "2rem" }}>📖</Typography>
+          <Typography
+            sx={{
+              fontSize: "0.75rem",
+              color: "#80868b",
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            No cover available
+          </Typography>
         </Box>
       )}
 
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
+      <CardContent sx={{ p: 2.5, pb: "20px !important" }}>
+        {/* Title */}
+        <Typography
+          sx={{
+            fontFamily: "'DM Sans', sans-serif",
+            fontWeight: 600,
+            fontSize: "0.975rem",
+            color: "#202124",
+            lineHeight: 1.35,
+            mb: 0.5,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
           {book.title}
         </Typography>
 
-        <Typography variant="subtitle2" color="text.secondary">
+        {/* Author */}
+        <Typography
+          sx={{
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: "0.825rem",
+            color: "#5f6368",
+            mb: 1.5,
+          }}
+        >
           {book.author}
         </Typography>
 
-        <Box sx={{ display: "flex", gap: 1, mt: 1, mb: 1, flexWrap: "wrap" }}>
-          <Chip label={book.year} size="small" />
-          <Chip label={book.genre} size="small" />
+        {/* Chips */}
+        <Box sx={{ display: "flex", gap: 0.75, flexWrap: "wrap", mb: 1.5 }}>
+          {book.year && (
+            <Chip
+              label={book.year}
+              size="small"
+              sx={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "0.75rem",
+                fontWeight: 500,
+                bgcolor: "#f1f3f4",
+                color: "#5f6368",
+                borderRadius: "8px",
+                height: 24,
+              }}
+            />
+          )}
+          {book.genre && (
+            <Chip
+              label={book.genre}
+              size="small"
+              sx={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "0.75rem",
+                fontWeight: 500,
+                bgcolor: genreColor.bg,
+                color: genreColor.color,
+                borderRadius: "8px",
+                height: 24,
+              }}
+            />
+          )}
         </Box>
 
-        <Typography variant="body2" color="text.secondary">
-          {book.description}
-        </Typography>
+        {/* Description */}
+        {book.description && (
+          <Typography
+            sx={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "0.825rem",
+              color: "#80868b",
+              lineHeight: 1.55,
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {book.description}
+          </Typography>
+        )}
       </CardContent>
     </Card>
   );
