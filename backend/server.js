@@ -1,32 +1,37 @@
-// ============================================================================
-// server.js - punto di ingresso dell'applicazione
-//
-// Compito unico: orchestrare l'avvio.
-//   1. carica le variabili da .env
-//   2. apre la connessione al DB
-//   3. avvia il server Express in ascolto sulla porta indicata
-//
-// La logica vera (rotte, controller) sta nei file dentro src/.
-// ============================================================================
+import express from "express";
+import connectDB from "./db.js";
+import cors from "cors";
 
-require('dotenv').config();
+const PORT = 3000;
+const app = express();
 
-const app = require('./src/app');
-const connectDB = require('./src/config/db');
+app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
+app.use(cors());
 
-// Funzione di avvio asincrona
-async function start() {
+app.get("/books", async (req, res, next) => {
   try {
-    await connectDB();              // 1. prima connetti al DB
-    app.listen(PORT, () => {        // 2. poi avvia il server
-      console.log(`Server in ascolto su http://localhost:${PORT}`);
-    });
+    const booksCollection = db.collection("books");
+    const filter = {};
+    const books = await booksCollection.find(filter).toArray();
+    res.json(books);
   } catch (err) {
-    console.error('Impossibile avviare il server:', err.message);
-    process.exit(1);                // esce con codice di errore
+    next(err);
+  }
+});
+
+let db;
+
+async function startServer() {
+  try {
+    db = await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
   }
 }
 
-start();
+startServer();
