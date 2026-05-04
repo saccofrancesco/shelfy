@@ -1,5 +1,10 @@
 {
+  "name": "shelfy",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\""
+  },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.0.0"
   }
 }
