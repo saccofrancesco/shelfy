@@ -4,7 +4,6 @@ import {
   Typography,
   Box,
   InputBase,
-  Avatar,
   IconButton,
   Chip,
 } from "@mui/material";
@@ -133,19 +132,6 @@ function Navbar({ searchQuery, onSearch, searchField, onFieldChange }) {
         </Box>
 
         <Box sx={{ flex: 1 }} />
-
-        <Avatar
-          sx={{
-            width: 34,
-            height: 34,
-            bgcolor: "#1a73e8",
-            fontSize: "0.85rem",
-            fontFamily: "'DM Sans', sans-serif",
-            cursor: "pointer",
-          }}
-        >
-          F
-        </Avatar>
       </Toolbar>
     </AppBar>
   );
