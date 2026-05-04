@@ -38,18 +38,30 @@ function BookCard({ book }) {
   }, [book.title]);
 
   return (
-    <Card sx={{ maxWidth: 320, borderRadius: 3 }}>
+    <Card
+      sx={{
+        maxWidth: 320,
+        borderRadius: 3,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       {coverUrl ? (
         <CardMedia
           component="img"
-          height="180"
           image={coverUrl}
           alt={book.title}
+          sx={{
+            width: "100%",
+            height: "auto",
+            objectFit: "contain",
+            backgroundColor: "#f5f5f5",
+          }}
         />
       ) : (
         <Box
           sx={{
-            height: 180,
+            height: 260,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -69,7 +81,7 @@ function BookCard({ book }) {
           {book.author}
         </Typography>
 
-        <Box sx={{ display: "flex", gap: 1, mt: 1, mb: 1 }}>
+        <Box sx={{ display: "flex", gap: 1, mt: 1, mb: 1, flexWrap: "wrap" }}>
           <Chip label={book.year} size="small" />
           <Chip label={book.genre} size="small" />
         </Box>
