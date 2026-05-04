@@ -23,7 +23,6 @@ function Navbar() {
       <Toolbar
         sx={{ gap: 2, px: { xs: 2, sm: 3 }, minHeight: "64px !important" }}
       >
-        {/* Logo */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mr: 2 }}>
           <AutoStoriesIcon sx={{ color: "#1a73e8", fontSize: 26 }} />
           <Typography
@@ -41,7 +40,6 @@ function Navbar() {
           </Typography>
         </Box>
 
-        {/* Search bar */}
         <Box
           sx={{
             display: "flex",
