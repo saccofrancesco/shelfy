@@ -39,7 +39,6 @@ function BookCard({ book }) {
 
   return (
     <Card sx={{ maxWidth: 320, borderRadius: 3 }}>
-      {/* Cover */}
       {coverUrl ? (
         <CardMedia
           component="img"
