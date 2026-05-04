@@ -12,11 +12,9 @@ function Navbar() {
   return (
     <AppBar position="static">
       <Toolbar>
-        {/* Logo */}
         <Typography variant="h6" sx={{ mr: 2 }}>
           Shelfy
         </Typography>
-        {/* Search */}
         <Box
           sx={{
             display: "flex",
