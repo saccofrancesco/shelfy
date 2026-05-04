@@ -3,7 +3,7 @@ import BookCard from "./BookCard";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function BookContainer() {
+function BooksContainer() {
   const [books, setBooks] = useState([]);
   const [refresh, setRefresh] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -17,42 +17,57 @@ function BookContainer() {
         setBooks(response.data);
         setErr(null);
       } catch (e) {
-        console.log(e);
         setErr(e);
       } finally {
         setLoading(false);
       }
     }
-
     fetchBooks();
   }, [refresh]);
 
   if (loading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-        <CircularProgress />
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+        <CircularProgress size={36} thickness={3} sx={{ color: "#1a73e8" }} />
       </Box>
     );
   }
 
   if (err) {
-    return <Typography color="error">Error loading books</Typography>;
+    return (
+      <Box sx={{ textAlign: "center", mt: 8 }}>
+        <Typography
+          color="error"
+          sx={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.95rem" }}
+        >
+          Couldn't load your books. Try again later.
+        </Typography>
+      </Box>
+    );
   }
 
   return (
     <Box
       sx={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-        gap: 2,
-        p: 2,
+        px: { xs: 2, sm: 3 },
+        py: 3,
+        backgroundColor: "#f8f9fa",
+        minHeight: "100vh",
       }}
     >
-      {books.map((book, index) => (
-        <BookCard key={book.id || index} book={book} />
-      ))}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+          gap: 2.5,
+        }}
+      >
+        {books.map((book, index) => (
+          <BookCard key={book.id || index} book={book} />
+        ))}
+      </Box>
     </Box>
   );
 }
 
-export default BookContainer;
+export default BooksContainer;
