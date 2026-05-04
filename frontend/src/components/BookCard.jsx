@@ -24,31 +24,37 @@ function hashIndex(str = "", len) {
   return h;
 }
 
+const coverCache = new Map(); // title → url string | null
+
 function BookCard({ book }) {
-  const [coverUrl, setCoverUrl] = useState(null);
-  const [coverLoading, setCoverLoading] = useState(true);
+  const [coverUrl, setCoverUrl] = useState(() =>
+    coverCache.has(book.title) ? coverCache.get(book.title) : undefined,
+  );
+  const coverLoading = coverUrl === undefined;
 
   useEffect(() => {
+    if (coverCache.has(book.title)) return;
+    let cancelled = false;
     async function fetchCover() {
       try {
         const res = await fetch(
           `https://openlibrary.org/search.json?title=${encodeURIComponent(book.title)}`,
         );
         const data = await res.json();
-        if (data.docs?.[0]?.cover_i) {
-          setCoverUrl(
-            `https://covers.openlibrary.org/b/id/${data.docs[0].cover_i}-L.jpg`,
-          );
-        } else {
-          setCoverUrl(null);
-        }
+        const url = data.docs?.[0]?.cover_i
+          ? `https://covers.openlibrary.org/b/id/${data.docs[0].cover_i}-L.jpg`
+          : null;
+        coverCache.set(book.title, url);
+        if (!cancelled) setCoverUrl(url);
       } catch {
-        setCoverUrl(null);
-      } finally {
-        setCoverLoading(false);
+        coverCache.set(book.title, null);
+        if (!cancelled) setCoverUrl(null);
       }
     }
     fetchCover();
+    return () => {
+      cancelled = true;
+    };
   }, [book.title]);
 
   const genreColor = chipColors[hashIndex(book.genre, chipColors.length)];
