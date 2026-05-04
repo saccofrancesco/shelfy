@@ -4,12 +4,20 @@ import {
   Typography,
   Box,
   InputBase,
+  Avatar,
   IconButton,
+  Chip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 
-function Navbar() {
+const FIELDS = [
+  { value: "title", label: "Title" },
+  { value: "author", label: "Author" },
+];
+
+function Navbar({ searchQuery, onSearch, searchField, onFieldChange }) {
   return (
     <AppBar
       position="static"
@@ -21,9 +29,15 @@ function Navbar() {
       }}
     >
       <Toolbar
-        sx={{ gap: 2, px: { xs: 2, sm: 3 }, minHeight: "64px !important" }}
+        sx={{
+          gap: 2,
+          px: { xs: 2, sm: 3 },
+          minHeight: "64px !important",
+          flexWrap: "wrap",
+        }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mr: 2 }}>
+        {/* Logo */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mr: 1 }}>
           <AutoStoriesIcon sx={{ color: "#1a73e8", fontSize: 26 }} />
           <Typography
             variant="h6"
@@ -40,6 +54,41 @@ function Navbar() {
           </Typography>
         </Box>
 
+        {/* Filter chips — Title / Author */}
+        <Box sx={{ display: "flex", gap: 0.75, flexShrink: 0 }}>
+          {FIELDS.map(({ value, label }) => {
+            const active = searchField === value;
+            return (
+              <Chip
+                key={value}
+                label={label}
+                onClick={() => onFieldChange(value)}
+                size="small"
+                sx={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: 500,
+                  fontSize: "0.8rem",
+                  height: 28,
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  // Active = filled blue, inactive = outlined grey
+                  backgroundColor: active ? "#e8f0fe" : "transparent",
+                  color: active ? "#1a73e8" : "#5f6368",
+                  border: "1px solid",
+                  borderColor: active ? "#c5d9fb" : "#dadce0",
+                  transition: "all 0.15s",
+                  "&:hover": {
+                    backgroundColor: active ? "#d2e3fc" : "#f1f3f4",
+                    borderColor: active ? "#a8c7f8" : "#bdc1c6",
+                  },
+                  "& .MuiChip-label": { px: 1.25 },
+                }}
+              />
+            );
+          })}
+        </Box>
+
+        {/* Search bar */}
         <Box
           sx={{
             display: "flex",
@@ -49,7 +98,7 @@ function Navbar() {
             px: 2,
             py: 0.75,
             flex: 1,
-            maxWidth: 560,
+            maxWidth: 520,
             transition: "background-color 0.2s, box-shadow 0.2s",
             "&:focus-within": {
               backgroundColor: "#fff",
@@ -57,9 +106,13 @@ function Navbar() {
             },
           }}
         >
-          <SearchIcon sx={{ color: "#5f6368", fontSize: 20, mr: 1 }} />
+          <SearchIcon
+            sx={{ color: "#5f6368", fontSize: 20, mr: 1, flexShrink: 0 }}
+          />
           <InputBase
-            placeholder="Search books, authors…"
+            value={searchQuery}
+            onChange={(e) => onSearch(e.target.value)}
+            placeholder={`Search by ${searchField}…`}
             sx={{
               flex: 1,
               fontSize: "0.925rem",
@@ -68,9 +121,31 @@ function Navbar() {
               "& input::placeholder": { color: "#80868b", opacity: 1 },
             }}
           />
+          {searchQuery && (
+            <IconButton
+              size="small"
+              onClick={() => onSearch("")}
+              sx={{ p: 0.25, color: "#5f6368" }}
+            >
+              <ClearIcon fontSize="small" />
+            </IconButton>
+          )}
         </Box>
 
         <Box sx={{ flex: 1 }} />
+
+        <Avatar
+          sx={{
+            width: 34,
+            height: 34,
+            bgcolor: "#1a73e8",
+            fontSize: "0.85rem",
+            fontFamily: "'DM Sans', sans-serif",
+            cursor: "pointer",
+          }}
+        >
+          F
+        </Avatar>
       </Toolbar>
     </AppBar>
   );
