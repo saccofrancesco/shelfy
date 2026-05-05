@@ -37,6 +37,35 @@ app.get("/books", async (req, res, next) => {
   }
 });
 
+app.post("/books", async (req, res, next) => {
+  try {
+    const booksCollection = db.collection("books");
+    const { title, author, year, genre, description } = req.body;
+    if (!title || !author) {
+      return res.status(400).json({
+        error: "title and author are required",
+      });
+    }
+    const newBook = {
+      title: title.trim(),
+      author: author.trim(),
+      year: year ? Number(year) : null,
+      genre: genre ? genre.trim() : "",
+      description: description ? description.trim() : "",
+    };
+    const result = await booksCollection.insertOne(newBook);
+    res.status(201).json({
+      message: "Book created",
+      book: {
+        _id: result.insertedId,
+        ...newBook,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 async function startServer() {
   try {
     db = await connectDB();
