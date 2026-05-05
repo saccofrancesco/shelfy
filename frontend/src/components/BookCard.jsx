@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -9,7 +8,6 @@ import {
   Skeleton,
 } from "@mui/material";
 
-// Soft palette for genre chips — cycles through a small set
 const chipColors = [
   { bg: "#e8f0fe", color: "#1a73e8" },
   { bg: "#fce8e6", color: "#c5221f" },
@@ -24,39 +22,9 @@ function hashIndex(str = "", len) {
   return h;
 }
 
-const coverCache = new Map(); // title → url string | null
-
-function BookCard({ book }) {
-  const [coverUrl, setCoverUrl] = useState(() =>
-    coverCache.has(book.title) ? coverCache.get(book.title) : undefined,
-  );
+// coverUrl: undefined = still loading, null = no cover found, string = image URL
+function BookCard({ book, coverUrl }) {
   const coverLoading = coverUrl === undefined;
-
-  useEffect(() => {
-    if (coverCache.has(book.title)) return;
-    let cancelled = false;
-    async function fetchCover() {
-      try {
-        const res = await fetch(
-          `https://openlibrary.org/search.json?title=${encodeURIComponent(book.title)}`,
-        );
-        const data = await res.json();
-        const url = data.docs?.[0]?.cover_i
-          ? `https://covers.openlibrary.org/b/id/${data.docs[0].cover_i}-L.jpg`
-          : null;
-        coverCache.set(book.title, url);
-        if (!cancelled) setCoverUrl(url);
-      } catch {
-        coverCache.set(book.title, null);
-        if (!cancelled) setCoverUrl(null);
-      }
-    }
-    fetchCover();
-    return () => {
-      cancelled = true;
-    };
-  }, [book.title]);
-
   const genreColor = chipColors[hashIndex(book.genre, chipColors.length)];
 
   return (
@@ -78,17 +46,8 @@ function BookCard({ book }) {
     >
       {/* Cover area */}
       {coverLoading ? (
-        <Box sx={{ p: 1.5, pt: 1.5 }}>
-          <Box
-            sx={{
-              height: 220,
-              borderRadius: "12px",
-              overflow: "hidden",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+        <Box sx={{ p: 1.5 }}>
+          <Box sx={{ height: 220, borderRadius: "12px", overflow: "hidden" }}>
             <Skeleton
               variant="rectangular"
               width="100%"
@@ -98,7 +57,7 @@ function BookCard({ book }) {
           </Box>
         </Box>
       ) : coverUrl ? (
-        <Box sx={{ p: 1.5, pt: 1.5 }}>
+        <Box sx={{ p: 1.5 }}>
           <Box
             sx={{
               height: 220,
@@ -113,11 +72,7 @@ function BookCard({ book }) {
               component="img"
               image={coverUrl}
               alt={book.title}
-              sx={{
-                maxHeight: "100%",
-                maxWidth: "100%",
-                objectFit: "contain",
-              }}
+              sx={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }}
             />
           </Box>
         </Box>
@@ -147,7 +102,6 @@ function BookCard({ book }) {
       )}
 
       <CardContent sx={{ p: 2.5, pb: "20px !important" }}>
-        {/* Title */}
         <Typography
           sx={{
             fontFamily: "'DM Sans', sans-serif",
@@ -165,7 +119,6 @@ function BookCard({ book }) {
           {book.title}
         </Typography>
 
-        {/* Author */}
         <Typography
           sx={{
             fontFamily: "'DM Sans', sans-serif",
@@ -177,7 +130,6 @@ function BookCard({ book }) {
           {book.author}
         </Typography>
 
-        {/* Chips */}
         <Box sx={{ display: "flex", gap: 0.75, flexWrap: "wrap", mb: 1.5 }}>
           {book.year && (
             <Chip
@@ -211,7 +163,6 @@ function BookCard({ book }) {
           )}
         </Box>
 
-        {/* Description */}
         {book.description && (
           <Typography
             sx={{
