@@ -41,7 +41,7 @@ async function fetchCovers(books) {
   return Object.fromEntries(entries);
 }
 
-function BooksContainer({ searchQuery, searchField }) {
+function BooksContainer({ searchQuery, searchField, refreshKey }) {
   const [books, setBooks] = useState([]);
   const [covers, setCovers] = useState({}); // { [title]: string | null | undefined }
   const [loading, setLoading] = useState(false);
@@ -80,7 +80,7 @@ function BooksContainer({ searchQuery, searchField }) {
 
     fetchBooks();
     return () => controller.abort();
-  }, [debouncedQuery, searchField]);
+  }, [debouncedQuery, searchField, refreshKey]);
 
   return (
     <Box
