@@ -45,7 +45,7 @@ function BookCard({ book, coverUrl }) {
     >
       {/* Cover area */}
       {coverUrl ? (
-        <Box sx={{ p: 1.5 }}>
+        <Box sx={{ p: 3 }}>
           <Box
             sx={{
               height: 220,
