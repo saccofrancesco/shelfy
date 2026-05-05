@@ -24,7 +24,6 @@ function hashIndex(str = "", len) {
 
 // coverUrl: undefined = still loading, null = no cover found, string = image URL
 function BookCard({ book, coverUrl }) {
-  const coverLoading = coverUrl === undefined;
   const genreColor = chipColors[hashIndex(book.genre, chipColors.length)];
 
   return (
@@ -45,18 +44,7 @@ function BookCard({ book, coverUrl }) {
       }}
     >
       {/* Cover area */}
-      {coverLoading ? (
-        <Box sx={{ p: 1.5 }}>
-          <Box sx={{ height: 220, borderRadius: "12px", overflow: "hidden" }}>
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={220}
-              animation="wave"
-            />
-          </Box>
-        </Box>
-      ) : coverUrl ? (
+      {coverUrl ? (
         <Box sx={{ p: 1.5 }}>
           <Box
             sx={{
