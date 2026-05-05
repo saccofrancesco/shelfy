@@ -77,22 +77,7 @@ function AddBookModal({ open, onClose, onBookAdded }) {
     };
   }
 
-  function validate() {
-    const next = {};
-    if (!form.title.trim()) next.title = "Title is required";
-    if (!form.author.trim()) next.author = "Author is required";
-    if (form.year) {
-      const y = Number(form.year);
-      if (!Number.isInteger(y) || y < 1 || y > new Date().getFullYear())
-        next.year = `Enter a valid year (1 – ${new Date().getFullYear()})`;
-    }
-    return next;
-  }
-
   async function handleSubmit() {
-    const next = validate();
-    if (Object.keys(next).length) return setErrors(next);
-
     try {
       setSaving(true);
       const payload = {
