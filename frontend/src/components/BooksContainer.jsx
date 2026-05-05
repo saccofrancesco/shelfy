@@ -91,33 +91,6 @@ function BooksContainer({ searchQuery, searchField }) {
         minHeight: "100vh",
       }}
     >
-      {/* Header */}
-      <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, mb: 2.5 }}>
-        <Typography
-          sx={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontWeight: 600,
-            fontSize: "1rem",
-            color: "#5f6368",
-            letterSpacing: "0.04em",
-            textTransform: "uppercase",
-          }}
-        >
-          {debouncedQuery ? `Results for "${debouncedQuery}"` : "Your library"}
-        </Typography>
-        {!loading && (
-          <Typography
-            sx={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "0.85rem",
-              color: "#9aa0a6",
-            }}
-          >
-            · {books.length}
-          </Typography>
-        )}
-      </Box>
-
       {loading && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
           <CircularProgress size={36} thickness={3} sx={{ color: "#1a73e8" }} />
