@@ -14,7 +14,6 @@ function App() {
         searchField={searchField}
         onFieldChange={(newField) => {
           setSearchField(newField);
-          setSearchQuery(""); // clear text when switching mode
         }}
       />
       <BooksContainer searchQuery={searchQuery} searchField={searchField} />
