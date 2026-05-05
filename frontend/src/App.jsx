@@ -20,7 +20,7 @@ function App() {
         onFieldChange={(newField) => {
           setSearchField(newField);
         }}
-        onAdded={handleBookAdded}
+        onBookAdded={handleBookAdded}
       />
       <BooksContainer
         searchQuery={searchQuery}
