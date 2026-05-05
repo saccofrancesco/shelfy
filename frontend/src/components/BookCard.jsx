@@ -78,24 +78,49 @@ function BookCard({ book }) {
     >
       {/* Cover area */}
       {coverLoading ? (
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          height={220}
-          animation="wave"
-        />
+        <Box sx={{ p: 1.5, pt: 1.5 }}>
+          <Box
+            sx={{
+              height: 220,
+              borderRadius: "12px",
+              overflow: "hidden",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height={220}
+              animation="wave"
+            />
+          </Box>
+        </Box>
       ) : coverUrl ? (
-        <CardMedia
-          component="img"
-          image={coverUrl}
-          alt={book.title}
-          sx={{
-            width: "100%",
-            height: 220,
-            objectFit: "cover",
-            backgroundColor: "#f1f3f4",
-          }}
-        />
+        <Box sx={{ p: 1.5, pt: 1.5 }}>
+          <Box
+            sx={{
+              height: 220,
+              borderRadius: "12px",
+              overflow: "hidden",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <CardMedia
+              component="img"
+              image={coverUrl}
+              alt={book.title}
+              sx={{
+                maxHeight: "100%",
+                maxWidth: "100%",
+                objectFit: "contain",
+              }}
+            />
+          </Box>
+        </Box>
       ) : (
         <Box
           sx={{
