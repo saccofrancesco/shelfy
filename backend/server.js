@@ -92,12 +92,12 @@ app.put("/books/:id", async (req, res, next) => {
     next(err);
   }
 });
+
 app.delete("/books/:id", async (req, res, next) => {
   try {
     const booksCollection = db.collection("books");
     const id = new ObjectId(req.params.id);
     const result = await booksCollection.deleteOne({ _id: id });
-
     if (result.deletedCount === 0) {
       return res.status(404).json({ error: "Book not found" });
     }
@@ -106,6 +106,7 @@ app.delete("/books/:id", async (req, res, next) => {
     next(err);
   }
 });
+
 async function startServer() {
   try {
     db = await connectDB();
