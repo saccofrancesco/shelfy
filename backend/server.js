@@ -1,7 +1,7 @@
 import express from "express";
 import connectDB from "./db.js";
 import cors from "cors";
-
+import { ObjectId } from "mongodb";
 const PORT = 3000;
 const app = express();
 
@@ -66,7 +66,34 @@ app.post("/books", async (req, res, next) => {
     next(err);
   }
 });
+app.put("/books/:id", async (req, res, next) => {
+  try {
+    const booksCollection = db.collection("books");
+    const id = new ObjectId(req.params.id);
+    const { title, author, year, genre, description, coverUrl } = req.body;
 
+    const updates = {};
+    if (title)       updates.title       = title.trim();
+    if (author)      updates.author      = author.trim();
+    if (year)        updates.year        = Number(year);
+    if (genre)       updates.genre       = genre.trim();
+    if (description) updates.description = description.trim();
+    if (coverUrl)    updates.coverUrl    = coverUrl.trim();
+
+    const result = await booksCollection.findOneAndUpdate(
+      { _id: id },
+      { $set: updates },
+      { returnDocument: "after" }
+    );
+
+    if (!result) {
+      return res.status(404).json({ error: "Book not found" });
+    }
+    res.json({ message: "Book updated", book: result });
+  } catch (err) {
+    next(err);
+  }
+});
 async function startServer() {
   try {
     db = await connectDB();
