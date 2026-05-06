@@ -14,18 +14,20 @@ import { useState } from "react";
 import axios from "axios";
 
 const GENRES = [
-  "Fiction",
-  "Non-Fiction",
-  "Science Fiction",
+  "Adventure",
+  "Coming-of-age",
+  "Drama",
+  "Dystopian",
   "Fantasy",
-  "Mystery",
+  "Fairy Tale",
+  "Historical",
+  "Novel",
+  "Philosophical",
+  "Post-apocalyptic",
+  "Psychological",
+  "Satire",
+  "Science Fiction",
   "Thriller",
-  "Romance",
-  "Horror",
-  "Biography",
-  "History",
-  "Science",
-  "Self-Help",
   "Other",
 ];
 
