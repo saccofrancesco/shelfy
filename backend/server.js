@@ -36,7 +36,32 @@ app.get("/books", async (req, res, next) => {
     next(err);
   }
 });
+app.post("/books", async (req, res, next) => {
+  try {
+    const { title, author, year, genre, description } = req.body || {};
 
+    if (!title?.trim() || !author?.trim()) {
+      return res
+        .status(400)
+        .json({ error: "title e author sono obbligatori" });
+    }
+
+    const doc = {
+      title: title.trim(),
+      author: author.trim(),
+      year: year ? Number(year) : null,
+      genre: genre ? String(genre).trim() : null,
+      description: description ? String(description).trim() : null,
+      createdAt: new Date(),
+    };
+
+    const result = await db.collection("books").insertOne(doc);
+
+    res.status(201).json({ _id: result.insertedId, ...doc });
+  } catch (err) {
+    next(err);
+  }
+});
 async function startServer() {
   try {
     db = await connectDB();
