@@ -5,8 +5,12 @@ import {
   Chip,
   Box,
   CardMedia,
-  Skeleton,
+  IconButton,
+  Divider,
+  Tooltip,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const chipColors = [
   { bg: "#e8f0fe", color: "#1a73e8" },
@@ -22,7 +26,6 @@ function hashIndex(str = "", len) {
   return h;
 }
 
-// coverUrl: undefined = still loading, null = no cover found, string = image URL
 function BookCard({ book }) {
   const genreColor = chipColors[hashIndex(book.genre, chipColors.length)];
 
@@ -36,11 +39,6 @@ function BookCard({ book }) {
         flexDirection: "column",
         overflow: "hidden",
         backgroundColor: "#fff",
-        transition: "box-shadow 0.2s, transform 0.2s",
-        "&:hover": {
-          boxShadow: "0 4px 20px rgba(32,33,36,0.12)",
-          transform: "translateY(-2px)",
-        },
       }}
     >
       <Box sx={{ p: 3 }}>
@@ -63,7 +61,7 @@ function BookCard({ book }) {
         </Box>
       </Box>
 
-      <CardContent sx={{ p: 2.5, pb: "20px !important" }}>
+      <CardContent sx={{ p: 2.5, pb: "12px !important", flexGrow: 1 }}>
         <Typography
           sx={{
             fontFamily: "'DM Sans', sans-serif",
@@ -142,6 +140,52 @@ function BookCard({ book }) {
           </Typography>
         )}
       </CardContent>
+
+      <Divider sx={{ borderColor: "#f1f3f4" }} />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          px: 1.5,
+          py: 0.75,
+          gap: 0.5,
+        }}
+      >
+        <Tooltip title="Edit" placement="top" arrow>
+          <IconButton
+            size="small"
+            sx={{
+              color: "#5f6368",
+              borderRadius: "8px",
+              transition: "background 0.15s, color 0.15s",
+              "&:hover": {
+                backgroundColor: "#e8f0fe",
+                color: "#1a73e8",
+              },
+            }}
+          >
+            <EditIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title="Delete" placement="top" arrow>
+          <IconButton
+            size="small"
+            sx={{
+              color: "#5f6368",
+              borderRadius: "8px",
+              transition: "background 0.15s, color 0.15s",
+              "&:hover": {
+                backgroundColor: "#fce8e6",
+                color: "#c5221f",
+              },
+            }}
+          >
+            <DeleteIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Tooltip>
+      </Box>
     </Card>
   );
 }
