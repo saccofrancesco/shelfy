@@ -23,7 +23,7 @@ function hashIndex(str = "", len) {
 }
 
 // coverUrl: undefined = still loading, null = no cover found, string = image URL
-function BookCard({ book, coverUrl }) {
+function BookCard({ book }) {
   const genreColor = chipColors[hashIndex(book.genre, chipColors.length)];
 
   return (
@@ -43,51 +43,25 @@ function BookCard({ book, coverUrl }) {
         },
       }}
     >
-      {/* Cover area */}
-      {coverUrl ? (
-        <Box sx={{ p: 3 }}>
-          <Box
-            sx={{
-              height: 220,
-              borderRadius: "12px",
-              overflow: "hidden",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <CardMedia
-              component="img"
-              image={coverUrl}
-              alt={book.title}
-              sx={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }}
-            />
-          </Box>
-        </Box>
-      ) : (
+      <Box sx={{ p: 3 }}>
         <Box
           sx={{
             height: 220,
+            borderRadius: "12px",
+            overflow: "hidden",
             display: "flex",
-            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            bgcolor: "#f1f3f4",
-            gap: 1,
           }}
         >
-          <Typography sx={{ fontSize: "2rem" }}>📖</Typography>
-          <Typography
-            sx={{
-              fontSize: "0.75rem",
-              color: "#80868b",
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-          >
-            No cover available
-          </Typography>
+          <CardMedia
+            component="img"
+            image={book.coverUrl}
+            alt={book.title}
+            sx={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }}
+          />
         </Box>
-      )}
+      </Box>
 
       <CardContent sx={{ p: 2.5, pb: "20px !important" }}>
         <Typography
