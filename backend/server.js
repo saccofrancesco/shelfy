@@ -40,7 +40,7 @@ app.get("/books", async (req, res, next) => {
 app.post("/books", async (req, res, next) => {
   try {
     const booksCollection = db.collection("books");
-    const { title, author, year, genre, description } = req.body;
+    const { title, author, year, genre, description, coverUrl } = req.body;
     if (!title || !author) {
       return res.status(400).json({
         error: "title and author are required",
@@ -52,6 +52,7 @@ app.post("/books", async (req, res, next) => {
       year: year ? Number(year) : null,
       genre: genre ? genre.trim() : "",
       description: description ? description.trim() : "",
+      coverUrl: coverUrl ? coverUrl.trim() : "",
     };
     const result = await booksCollection.insertOne(newBook);
     res.status(201).json({
