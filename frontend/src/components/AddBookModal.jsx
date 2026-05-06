@@ -69,6 +69,21 @@ function AddBookModal({ open, onClose, onBookAdded }) {
   const [saving, setSaving] = useState(false);
   const [serverError, setServerError] = useState(null);
 
+  async function fetchCoverByTitle(title) {
+    try {
+      const res = await axios.get(
+        `https://openlibrary.org/search.json?title=${encodeURIComponent(title)}&fields=cover_i&limit=1`,
+      );
+      const data = await res.data;
+      const url = data.docs?.[0]?.cover_i
+        ? `https://covers.openlibrary.org/b/id/${data.docs[0].cover_i}-L.jpg`
+        : null;
+      return url;
+    } catch {
+      return null;
+    }
+  }
+
   function handleChange(field) {
     return (e) => {
       setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -80,9 +95,10 @@ function AddBookModal({ open, onClose, onBookAdded }) {
   async function handleSubmit() {
     try {
       setSaving(true);
+      const coverUrl = await fetchCoverByTitle(form.title);
       const payload = {
         ...form,
-        year: form.year ? Number(form.year) : null,
+        coverUrl,
       };
       const response = await axios.post("http://localhost:3000/books", payload);
       onBookAdded?.(response.data);
