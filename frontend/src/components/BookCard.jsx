@@ -26,7 +26,7 @@ function hashIndex(str = "", len) {
   return h;
 }
 
-function BookCard({ book }) {
+function BookCard({ book, onDeleteClick }) {
   const genreColor = chipColors[hashIndex(book.genre, chipColors.length)];
 
   return (
@@ -172,6 +172,7 @@ function BookCard({ book }) {
         <Tooltip title="Delete" placement="top" arrow>
           <IconButton
             size="small"
+            onClick={() => onDeleteClick(book)}
             sx={{
               color: "#5f6368",
               borderRadius: "8px",
