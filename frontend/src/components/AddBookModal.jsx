@@ -213,7 +213,7 @@ function AddBookModal({ open, onClose, onBookAdded }) {
               type="number"
               size="small"
               sx={{ ...inputSx, flex: 1 }}
-              inputProps={{ min: 1, max: new Date().getFullYear() }}
+              inputprops={{ min: 1, max: new Date().getFullYear() }}
             />
             <TextField
               select
@@ -222,7 +222,7 @@ function AddBookModal({ open, onClose, onBookAdded }) {
               onChange={handleChange("genre")}
               size="small"
               sx={{ ...inputSx, flex: 2 }}
-              SelectProps={{
+              selectprops={{
                 MenuProps: {
                   PaperProps: {
                     sx: {
