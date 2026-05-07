@@ -1,6 +1,7 @@
 import { Box, Typography, CircularProgress } from "@mui/material";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
 import BookCard from "./BookCard";
+import EditBookModal from "./EditBookModal";
 import DeleteBookModal from "./DeleteBookModal";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -18,6 +19,7 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
+  const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
 
@@ -51,9 +53,20 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
     return () => controller.abort();
   }, [debouncedQuery, searchField, refreshKey]);
 
+  function handleEditClick(book) {
+    setSelectedBook(book);
+    setEditOpen(true);
+  }
+
   function handleDeleteClick(book) {
     setSelectedBook(book);
     setDeleteOpen(true);
+  }
+
+  function handleBookUpdated(updatedBook) {
+    setBooks((prev) =>
+      prev.map((b) => (b._id === updatedBook._id ? updatedBook : b)),
+    );
   }
 
   function handleBookDeleted(bookId) {
@@ -154,12 +167,20 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
               <BookCard
                 key={book._id}
                 book={book}
+                onEditClick={handleEditClick}
                 onDeleteClick={handleDeleteClick}
               />
             ))}
           </Box>
         )}
       </Box>
+
+      <EditBookModal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        book={selectedBook}
+        onBookUpdated={handleBookUpdated}
+      />
 
       <DeleteBookModal
         open={deleteOpen}
