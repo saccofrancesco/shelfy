@@ -1,7 +1,8 @@
 import { Box, Typography, CircularProgress } from "@mui/material";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
 import BookCard from "./BookCard";
-import { useState, useEffect, useRef } from "react";
+import DeleteBookModal from "./DeleteBookModal";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 function useDebounce(value, delay) {
@@ -17,111 +18,156 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
 
   const debouncedQuery = useDebounce(searchQuery, 350);
 
   useEffect(() => {
     const controller = new AbortController();
-
     async function fetchBooks() {
       try {
         setLoading(true);
         setErr(null);
         const response = await axios.get("http://localhost:3000/books", {
-          params: { q: debouncedQuery, field: searchField },
+          params: {
+            q: debouncedQuery,
+            field: searchField,
+          },
           signal: controller.signal,
         });
-        const fetchedBooks = response.data;
-        setBooks(fetchedBooks);
+        setBooks(response.data);
       } catch (e) {
-        if (!axios.isCancel(e)) setErr(e);
+        if (!axios.isCancel(e)) {
+          setErr(e);
+        }
       } finally {
-        if (!controller.signal.aborted) setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     }
-
     fetchBooks();
     return () => controller.abort();
   }, [debouncedQuery, searchField, refreshKey]);
 
+  function handleDeleteClick(book) {
+    setSelectedBook(book);
+    setDeleteOpen(true);
+  }
+
+  function handleBookDeleted(bookId) {
+    setBooks((prev) => prev.filter((book) => book._id !== bookId));
+  }
+
   return (
-    <Box
-      sx={{
-        px: { xs: 2, sm: 3 },
-        py: 3,
-        backgroundColor: "#f8f9fa",
-        minHeight: "100vh",
-      }}
-    >
-      {loading && (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-          <CircularProgress size={36} thickness={3} sx={{ color: "#1a73e8" }} />
-        </Box>
-      )}
-
-      {!loading && err && (
-        <Box sx={{ textAlign: "center", mt: 8 }}>
-          <Typography
+    <>
+      <Box
+        sx={{
+          px: { xs: 2, sm: 3 },
+          py: 3,
+          backgroundColor: "#f8f9fa",
+          minHeight: "100vh",
+        }}
+      >
+        {loading && (
+          <Box
             sx={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "0.95rem",
-              color: "#c5221f",
+              display: "flex",
+              justifyContent: "center",
+              mt: 8,
             }}
           >
-            Couldn't load books. Try again later.
-          </Typography>
-        </Box>
-      )}
+            <CircularProgress
+              size={36}
+              thickness={3}
+              sx={{ color: "#1a73e8" }}
+            />
+          </Box>
+        )}
 
-      {!loading && !err && books.length === 0 && (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            mt: 10,
-            gap: 1.5,
-          }}
-        >
-          <SearchOffIcon sx={{ fontSize: 48, color: "#dadce0" }} />
-          <Typography
+        {!loading && err && (
+          <Box sx={{ textAlign: "center", mt: 8 }}>
+            <Typography
+              sx={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "0.95rem",
+                color: "#c5221f",
+              }}
+            >
+              Couldn't load books. Try again later.
+            </Typography>
+          </Box>
+        )}
+
+        {!loading && !err && books.length === 0 && (
+          <Box
             sx={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontWeight: 600,
-              fontSize: "1rem",
-              color: "#5f6368",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              mt: 10,
+              gap: 1.5,
             }}
           >
-            No books found
-          </Typography>
-          <Typography
+            <SearchOffIcon
+              sx={{
+                fontSize: 48,
+                color: "#dadce0",
+              }}
+            />
+
+            <Typography
+              sx={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontWeight: 600,
+                fontSize: "1rem",
+                color: "#5f6368",
+              }}
+            >
+              No books found
+            </Typography>
+
+            <Typography
+              sx={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "0.875rem",
+                color: "#9aa0a6",
+              }}
+            >
+              {debouncedQuery
+                ? `No ${searchField} matched "${debouncedQuery}"`
+                : "Your library is empty"}
+            </Typography>
+          </Box>
+        )}
+
+        {!loading && !err && books.length > 0 && (
+          <Box
             sx={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "0.875rem",
-              color: "#9aa0a6",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+              gap: 2.5,
             }}
           >
-            {debouncedQuery
-              ? `No ${searchField} matched "${debouncedQuery}"`
-              : "Your library is empty"}
-          </Typography>
-        </Box>
-      )}
+            {books.map((book) => (
+              <BookCard
+                key={book._id}
+                book={book}
+                onDeleteClick={handleDeleteClick}
+              />
+            ))}
+          </Box>
+        )}
+      </Box>
 
-      {!loading && !err && books.length > 0 && (
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-            gap: 2.5,
-          }}
-        >
-          {books.map((book, index) => (
-            <BookCard key={book.id || index} book={book} />
-          ))}
-        </Box>
-      )}
-    </Box>
+      <DeleteBookModal
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        book={selectedBook}
+        onBookDeleted={handleBookDeleted}
+      />
+    </>
   );
 }
 
