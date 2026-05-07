@@ -26,7 +26,7 @@ function hashIndex(str = "", len) {
   return h;
 }
 
-function BookCard({ book, onDeleteClick }) {
+function BookCard({ book, onEditClick, onDeleteClick }) {
   const genreColor = chipColors[hashIndex(book.genre, chipColors.length)];
 
   return (
@@ -155,6 +155,7 @@ function BookCard({ book, onDeleteClick }) {
         <Tooltip title="Edit" placement="top" arrow>
           <IconButton
             size="small"
+            onClick={() => onEditClick(book)}
             sx={{
               color: "#5f6368",
               borderRadius: "8px",
