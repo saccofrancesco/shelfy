@@ -5,15 +5,8 @@ import EditBookModal from "./EditBookModal";
 import DeleteBookModal from "./DeleteBookModal";
 import { useState, useEffect } from "react";
 import axios from "axios";
-
-function useDebounce(value, delay) {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const timer = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(timer);
-  }, [value, delay]);
-  return debounced;
-}
+import useDebouncedValue from "../hooks/useDebouncedValue";
+import http from "../lib/http";
 
 function BooksContainer({ searchQuery, searchField, refreshKey }) {
   const [books, setBooks] = useState([]);
@@ -23,7 +16,7 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
 
-  const debouncedQuery = useDebounce(searchQuery, 350);
+  const debouncedQuery = useDebouncedValue(searchQuery, 350);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -31,7 +24,7 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
       try {
         setLoading(true);
         setErr(null);
-        const response = await axios.get("http://localhost:3000/books", {
+        const response = await http.get("/books", {
           params: {
             q: debouncedQuery,
             field: searchField,
@@ -176,6 +169,7 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
       </Box>
 
       <EditBookModal
+        key={`${selectedBook?._id ?? "edit-empty"}-${editOpen ? "open" : "closed"}`}
         open={editOpen}
         onClose={() => setEditOpen(false)}
         book={selectedBook}
