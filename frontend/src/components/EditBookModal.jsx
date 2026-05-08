@@ -10,81 +10,30 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
-import { useEffect, useState } from "react";
-import axios from "axios";
-
-const GENRES = [
-  "Adventure",
-  "Coming-of-age",
-  "Drama",
-  "Dystopian",
-  "Fantasy",
-  "Fairy Tale",
-  "Historical",
-  "Novel",
-  "Philosophical",
-  "Post-apocalyptic",
-  "Psychological",
-  "Satire",
-  "Science Fiction",
-  "Thriller",
-  "Other",
-];
-
-const inputSx = {
-  "& .MuiOutlinedInput-root": {
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "0.9rem",
-    borderRadius: "10px",
-    backgroundColor: "#fafafa",
-    transition: "background-color 0.15s",
-    "& fieldset": { borderColor: "#e0e0e0" },
-    "&:hover fieldset": { borderColor: "#bdc1c6" },
-    "&.Mui-focused": {
-      backgroundColor: "#fff",
-      "& fieldset": {
-        borderColor: "#1a73e8",
-        borderWidth: "1.5px",
-      },
-    },
-  },
-
-  "& .MuiInputLabel-root": {
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "0.875rem",
-    color: "#80868b",
-    "&.Mui-focused": { color: "#1a73e8" },
-  },
-
-  "& .MuiFormHelperText-root": {
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "0.75rem",
-  },
-};
+import { useState } from "react";
+import { BOOK_GENRES } from "../constants/books";
+import { bookToForm } from "../lib/bookForm";
+import http from "../lib/http";
+import { getModalSurfaceSx, inputSx, menuPaperSx } from "./bookModalStyles";
 
 function EditBookModal({ open, onClose, book, onBookUpdated }) {
-  const [form, setForm] = useState({
-    title: "",
-    author: "",
-    year: "",
-    genre: "",
-    description: "",
-  });
-
+  const [form, setForm] = useState(() => bookToForm(book));
   const [saving, setSaving] = useState(false);
   const [serverError, setServerError] = useState(null);
 
-  useEffect(() => {
-    if (book) {
-      setForm({
-        title: book.title || "",
-        author: book.author || "",
-        year: book.year || "",
-        genre: book.genre || "",
-        description: book.description || "",
-      });
+  function validateForm() {
+    const nextErrors = {};
+
+    if (!form.title.trim()) {
+      nextErrors.title = "Title is required";
     }
-  }, [book]);
+
+    if (!form.author.trim()) {
+      nextErrors.author = "Author is required";
+    }
+
+    return nextErrors;
+  }
 
   function handleChange(field) {
     return (e) => {
@@ -98,21 +47,31 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
   }
 
   async function handleSubmit() {
+    if (!book) {
+      return;
+    }
+
+    const nextErrors = validateForm();
+    if (Object.keys(nextErrors).length > 0) {
+      setServerError("Title and author cannot be empty.");
+      return;
+    }
+
     try {
       setSaving(true);
       setServerError(null);
 
-      const response = await axios.put(
-        `http://localhost:3000/books/${book._id}`,
-        {
-          ...book,
-          ...form,
-        },
-      );
-      onBookUpdated?.(response.data.book);
+      const response = await http.put(`/books/${book._id}`, {
+        title: form.title.trim(),
+        author: form.author.trim(),
+        year: form.year,
+        genre: form.genre.trim(),
+        description: form.description.trim(),
+      });
 
+      onBookUpdated?.(response.data.book);
       handleClose();
-    } catch (err) {
+    } catch {
       setServerError("Failed to update the book. Please try again.");
     } finally {
       setSaving(false);
@@ -130,21 +89,7 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: { xs: "calc(100% - 32px)", sm: 520 },
-          backgroundColor: "#fff",
-          borderRadius: "16px",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.14)",
-          outline: "none",
-          overflow: "hidden",
-        }}
-      >
-        {/* Header */}
+      <Box sx={getModalSurfaceSx({ xs: "calc(100% - 32px)", sm: 520 })}>
         <Box
           sx={{
             display: "flex",
@@ -184,7 +129,6 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
           </IconButton>
         </Box>
 
-        {/* Body */}
         <Box
           sx={{
             px: 3,
@@ -221,7 +165,7 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
               type="number"
               size="small"
               sx={{ ...inputSx, flex: 1 }}
-              inputprops={{
+              inputProps={{
                 min: 1,
                 max: new Date().getFullYear(),
               }}
@@ -234,17 +178,10 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
               onChange={handleChange("genre")}
               size="small"
               sx={{ ...inputSx, flex: 2 }}
-              selectprops={{
+              SelectProps={{
                 MenuProps: {
                   PaperProps: {
-                    sx: {
-                      borderRadius: "10px",
-                      boxShadow: "0 4px 20px rgba(0,0,0,0.10)",
-                      "& .MuiMenuItem-root": {
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "0.875rem",
-                      },
-                    },
+                    sx: menuPaperSx,
                   },
                 },
               }}
@@ -260,7 +197,7 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
                 </em>
               </MenuItem>
 
-              {GENRES.map((g) => (
+              {BOOK_GENRES.map((g) => (
                 <MenuItem key={g} value={g}>
                   {g}
                 </MenuItem>
@@ -291,7 +228,6 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
             </Typography>
           )}
 
-          {/* Actions */}
           <Box
             sx={{
               display: "flex",
