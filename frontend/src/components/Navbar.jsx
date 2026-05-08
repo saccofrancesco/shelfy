@@ -14,11 +14,7 @@ import AddIcon from "@mui/icons-material/Add";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import { useState } from "react";
 import AddBookModal from "./AddBookModal";
-
-const FIELDS = [
-  { value: "title", label: "Title" },
-  { value: "author", label: "Author" },
-];
+import { SEARCH_FIELDS } from "../constants/books";
 
 function Navbar({
   searchQuery,
@@ -68,7 +64,7 @@ function Navbar({
 
           {/* Filter chips — Title / Author */}
           <Box sx={{ display: "flex", gap: 0.75, flexShrink: 0 }}>
-            {FIELDS.map(({ value, label }) => {
+            {SEARCH_FIELDS.map(({ value, label }) => {
               const active = searchField === value;
               return (
                 <Chip
