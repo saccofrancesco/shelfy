@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 
 const chipColors = [
   { bg: "#e8f0fe", color: "#1a73e8" },
@@ -28,6 +29,7 @@ function hashIndex(str = "", len) {
 
 function BookCard({ book, onEditClick, onDeleteClick }) {
   const genreColor = chipColors[hashIndex(book.genre, chipColors.length)];
+  const hasCover = Boolean(book.coverUrl);
 
   return (
     <Card
@@ -52,12 +54,45 @@ function BookCard({ book, onEditClick, onDeleteClick }) {
             justifyContent: "center",
           }}
         >
-          <CardMedia
-            component="img"
-            image={book.coverUrl}
-            alt={book.title}
-            sx={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }}
-          />
+          {hasCover ? (
+            <CardMedia
+              component="img"
+              image={book.coverUrl}
+              alt={book.title}
+              loading="lazy"
+              sx={{
+                maxHeight: "100%",
+                maxWidth: "100%",
+                objectFit: "contain",
+              }}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                borderRadius: "12px",
+                border: "1px dashed #dadce0",
+                backgroundColor: "#fafafa",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#9aa0a6",
+                gap: 1,
+              }}
+            >
+              <AutoStoriesIcon sx={{ fontSize: 28 }} />
+              <Typography
+                sx={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                }}
+              >
+                No cover
+              </Typography>
+            </Box>
+          )}
         </Box>
       </Box>
 
