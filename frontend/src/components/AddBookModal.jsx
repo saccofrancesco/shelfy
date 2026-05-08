@@ -12,61 +12,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import { useState } from "react";
 import axios from "axios";
-
-const GENRES = [
-  "Adventure",
-  "Coming-of-age",
-  "Drama",
-  "Dystopian",
-  "Fantasy",
-  "Fairy Tale",
-  "Historical",
-  "Novel",
-  "Philosophical",
-  "Post-apocalyptic",
-  "Psychological",
-  "Satire",
-  "Science Fiction",
-  "Thriller",
-  "Other",
-];
-
-const EMPTY_FORM = {
-  title: "",
-  author: "",
-  year: "",
-  genre: "",
-  description: "",
-};
-
-const inputSx = {
-  "& .MuiOutlinedInput-root": {
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "0.9rem",
-    borderRadius: "10px",
-    backgroundColor: "#fafafa",
-    transition: "background-color 0.15s",
-    "& fieldset": { borderColor: "#e0e0e0" },
-    "&:hover fieldset": { borderColor: "#bdc1c6" },
-    "&.Mui-focused": {
-      backgroundColor: "#fff",
-      "& fieldset": { borderColor: "#1a73e8", borderWidth: "1.5px" },
-    },
-  },
-  "& .MuiInputLabel-root": {
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "0.875rem",
-    color: "#80868b",
-    "&.Mui-focused": { color: "#1a73e8" },
-  },
-  "& .MuiFormHelperText-root": {
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "0.75rem",
-  },
-};
+import { BOOK_GENRES } from "../constants/books";
+import { createEmptyBookForm } from "../lib/bookForm";
+import http from "../lib/http";
+import { getModalSurfaceSx, inputSx, menuPaperSx } from "./bookModalStyles";
 
 function AddBookModal({ open, onClose, onBookAdded }) {
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [form, setForm] = useState(createEmptyBookForm());
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
   const [serverError, setServerError] = useState(null);
@@ -76,14 +28,41 @@ function AddBookModal({ open, onClose, onBookAdded }) {
       const res = await axios.get(
         `https://openlibrary.org/search.json?title=${encodeURIComponent(title)}&fields=cover_i&limit=1`,
       );
-      const data = await res.data;
-      const url = data.docs?.[0]?.cover_i
+      const data = res.data;
+      return data.docs?.[0]?.cover_i
         ? `https://covers.openlibrary.org/b/id/${data.docs[0].cover_i}-L.jpg`
         : null;
-      return url;
     } catch {
       return null;
     }
+  }
+
+  function validateForm() {
+    const nextErrors = {};
+
+    if (!form.title.trim()) {
+      nextErrors.title = "Title is required";
+    }
+
+    if (!form.author.trim()) {
+      nextErrors.author = "Author is required";
+    }
+
+    if (form.year) {
+      const parsedYear = Number(form.year);
+      const currentYear = new Date().getFullYear();
+
+      if (
+        !Number.isInteger(parsedYear) ||
+        parsedYear < 1 ||
+        parsedYear > currentYear
+      ) {
+        nextErrors.year = "Enter a valid year";
+      }
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
   }
 
   function handleChange(field) {
@@ -95,17 +74,28 @@ function AddBookModal({ open, onClose, onBookAdded }) {
   }
 
   async function handleSubmit() {
+    if (!validateForm()) {
+      return;
+    }
+
     try {
       setSaving(true);
-      const coverUrl = await fetchCoverByTitle(form.title);
+      setServerError(null);
+
+      const coverUrl = await fetchCoverByTitle(form.title.trim());
       const payload = {
         ...form,
+        title: form.title.trim(),
+        author: form.author.trim(),
+        genre: form.genre.trim(),
+        description: form.description.trim(),
         coverUrl,
       };
-      const response = await axios.post("http://localhost:3000/books", payload);
+
+      const response = await http.post("/books", payload);
       onBookAdded?.(response.data);
       handleClose();
-    } catch (e) {
+    } catch {
       setServerError("Failed to save the book. Please try again.");
     } finally {
       setSaving(false);
@@ -113,7 +103,7 @@ function AddBookModal({ open, onClose, onBookAdded }) {
   }
 
   function handleClose() {
-    setForm(EMPTY_FORM);
+    setForm(createEmptyBookForm());
     setErrors({});
     setServerError(null);
     onClose();
@@ -121,21 +111,7 @@ function AddBookModal({ open, onClose, onBookAdded }) {
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: { xs: "calc(100% - 32px)", sm: 520 },
-          backgroundColor: "#fff",
-          borderRadius: "16px",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.14)",
-          outline: "none",
-          overflow: "hidden",
-        }}
-      >
-        {/* Header */}
+      <Box sx={getModalSurfaceSx({ xs: "calc(100% - 32px)", sm: 520 })}>
         <Box
           sx={{
             display: "flex",
@@ -167,7 +143,6 @@ function AddBookModal({ open, onClose, onBookAdded }) {
           </IconButton>
         </Box>
 
-        {/* Form body */}
         <Box
           sx={{
             px: 3,
@@ -178,7 +153,6 @@ function AddBookModal({ open, onClose, onBookAdded }) {
             gap: 2,
           }}
         >
-          {/* Title */}
           <TextField
             label="Title"
             value={form.title}
@@ -190,7 +164,6 @@ function AddBookModal({ open, onClose, onBookAdded }) {
             sx={inputSx}
           />
 
-          {/* Author */}
           <TextField
             label="Author"
             value={form.author}
@@ -202,7 +175,6 @@ function AddBookModal({ open, onClose, onBookAdded }) {
             sx={inputSx}
           />
 
-          {/* Year + Genre side by side */}
           <Box sx={{ display: "flex", gap: 2 }}>
             <TextField
               label="Year"
@@ -213,7 +185,7 @@ function AddBookModal({ open, onClose, onBookAdded }) {
               type="number"
               size="small"
               sx={{ ...inputSx, flex: 1 }}
-              inputprops={{ min: 1, max: new Date().getFullYear() }}
+              inputProps={{ min: 1, max: new Date().getFullYear() }}
             />
             <TextField
               select
@@ -222,17 +194,10 @@ function AddBookModal({ open, onClose, onBookAdded }) {
               onChange={handleChange("genre")}
               size="small"
               sx={{ ...inputSx, flex: 2 }}
-              selectprops={{
+              SelectProps={{
                 MenuProps: {
                   PaperProps: {
-                    sx: {
-                      borderRadius: "10px",
-                      boxShadow: "0 4px 20px rgba(0,0,0,0.10)",
-                      "& .MuiMenuItem-root": {
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "0.875rem",
-                      },
-                    },
+                    sx: menuPaperSx,
                   },
                 },
               }}
@@ -240,7 +205,7 @@ function AddBookModal({ open, onClose, onBookAdded }) {
               <MenuItem value="">
                 <em style={{ color: "#80868b", fontStyle: "normal" }}>None</em>
               </MenuItem>
-              {GENRES.map((g) => (
+              {BOOK_GENRES.map((g) => (
                 <MenuItem key={g} value={g}>
                   {g}
                 </MenuItem>
@@ -248,7 +213,6 @@ function AddBookModal({ open, onClose, onBookAdded }) {
             </TextField>
           </Box>
 
-          {/* Description */}
           <TextField
             label="Description"
             value={form.description}
@@ -260,7 +224,6 @@ function AddBookModal({ open, onClose, onBookAdded }) {
             sx={inputSx}
           />
 
-          {/* Server error */}
           {serverError && (
             <Typography
               sx={{
@@ -273,7 +236,6 @@ function AddBookModal({ open, onClose, onBookAdded }) {
             </Typography>
           )}
 
-          {/* Actions */}
           <Box
             sx={{
               display: "flex",
@@ -293,11 +255,14 @@ function AddBookModal({ open, onClose, onBookAdded }) {
                 color: "#5f6368",
                 borderRadius: "8px",
                 px: 2,
-                "&:hover": { backgroundColor: "#f1f3f4" },
+                "&:hover": {
+                  backgroundColor: "#f1f3f4",
+                },
               }}
             >
               Cancel
             </Button>
+
             <Button
               onClick={handleSubmit}
               disabled={saving}
@@ -311,9 +276,14 @@ function AddBookModal({ open, onClose, onBookAdded }) {
                 borderRadius: "8px",
                 px: 2.5,
                 backgroundColor: "#1a73e8",
-                "&:hover": { backgroundColor: "#1765cc" },
-                "&:disabled": { backgroundColor: "#c5d9fb", color: "#fff" },
-                minWidth: 80,
+                "&:hover": {
+                  backgroundColor: "#1765cc",
+                },
+                "&:disabled": {
+                  backgroundColor: "#c5d9fb",
+                  color: "#fff",
+                },
+                minWidth: 92,
               }}
             >
               {saving ? (
