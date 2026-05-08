@@ -8,8 +8,8 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
-import axios from "axios";
 import { useState } from "react";
+import http from "../lib/http";
 
 function DeleteBookModal({ open, onClose, book, onBookDeleted }) {
   const [deleting, setDeleting] = useState(false);
@@ -20,11 +20,11 @@ function DeleteBookModal({ open, onClose, book, onBookDeleted }) {
       setDeleting(true);
       setServerError(null);
 
-      await axios.delete(`http://localhost:3000/books/${book._id}`);
+      await http.delete(`/books/${book._id}`);
 
       onBookDeleted?.(book._id);
       handleClose();
-    } catch (err) {
+    } catch {
       setServerError("Failed to delete the book. Please try again.");
     } finally {
       setDeleting(false);
