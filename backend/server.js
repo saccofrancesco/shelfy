@@ -1,36 +1,33 @@
 import express from "express";
-import connectDB from "./db.js";
 import cors from "cors";
-import { ObjectId } from "mongodb";
-const PORT = 3000;
+import connectDB from "./db.js";
+import {
+  buildBooksFilter,
+  normalizeBookPayload,
+  parseObjectId,
+} from "./books.js";
+
+const PORT = Number(process.env.PORT ?? 3000);
 const app = express();
 
-app.use(express.json());
+app.disable("x-powered-by");
+app.use(express.json({ limit: "1mb" }));
 app.use(cors());
 
 let db;
 
+function getBooksCollection() {
+  return db.collection("books");
+}
+
 app.get("/books", async (req, res, next) => {
   try {
-    const booksCollection = db.collection("books");
+    const filter = buildBooksFilter(req.query);
+    const books = await getBooksCollection()
+      .find(filter)
+      .sort({ title: 1, author: 1 })
+      .toArray();
 
-    const { q = "", field = "title" } = req.query;
-
-    // No query → return everything
-    if (!q.trim()) {
-      const books = await booksCollection.find({}).toArray();
-      return res.json(books);
-    }
-
-    // field must be one of the two allowed values — never trust client input directly
-    const allowedFields = ["title", "author"];
-    const searchField = allowedFields.includes(field) ? field : "title";
-
-    const filter = {
-      [searchField]: { $regex: q.trim(), $options: "i" },
-    };
-
-    const books = await booksCollection.find(filter).toArray();
     res.json(books);
   } catch (err) {
     next(err);
@@ -39,27 +36,21 @@ app.get("/books", async (req, res, next) => {
 
 app.post("/books", async (req, res, next) => {
   try {
-    const booksCollection = db.collection("books");
-    const { title, author, year, genre, description, coverUrl } = req.body;
-    if (!title || !author) {
+    const { book, errors } = normalizeBookPayload(req.body);
+    if (Object.keys(errors).length > 0) {
       return res.status(400).json({
-        error: "title and author are required",
+        error: "Invalid book data",
+        details: errors,
       });
     }
-    const newBook = {
-      title: title.trim(),
-      author: author.trim(),
-      year: year ? Number(year) : null,
-      genre: genre ? genre.trim() : "",
-      description: description ? description.trim() : "",
-      coverUrl: coverUrl ? coverUrl.trim() : "",
-    };
-    const result = await booksCollection.insertOne(newBook);
+
+    const result = await getBooksCollection().insertOne(book);
+
     res.status(201).json({
       message: "Book created",
       book: {
         _id: result.insertedId,
-        ...newBook,
+        ...book,
       },
     });
   } catch (err) {
@@ -69,25 +60,32 @@ app.post("/books", async (req, res, next) => {
 
 app.put("/books/:id", async (req, res, next) => {
   try {
-    const booksCollection = db.collection("books");
-    const id = new ObjectId(req.params.id);
-    const { title, author, year, genre, description, coverUrl } = req.body;
-    const updates = {};
-    if (title) updates.title = title.trim();
-    if (author) updates.author = author.trim();
-    if (year) updates.year = Number(year);
-    if (genre) updates.genre = genre.trim();
-    if (description) updates.description = description.trim();
-    if (coverUrl) updates.coverUrl = coverUrl.trim();
-    const result = await booksCollection.findOneAndUpdate(
+    const id = parseObjectId(req.params.id);
+    if (!id) {
+      return res.status(400).json({ error: "Invalid book id" });
+    }
+
+    const { book, errors } = normalizeBookPayload(req.body, {
+      partial: true,
+    });
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({
+        error: "Invalid book data",
+        details: errors,
+      });
+    }
+
+    const updatedBook = await getBooksCollection().findOneAndUpdate(
       { _id: id },
-      { $set: updates },
+      { $set: book },
       { returnDocument: "after" },
     );
-    if (!result) {
+
+    if (!updatedBook) {
       return res.status(404).json({ error: "Book not found" });
     }
-    res.json({ message: "Book updated", book: result });
+
+    res.json({ message: "Book updated", book: updatedBook });
   } catch (err) {
     next(err);
   }
@@ -95,21 +93,31 @@ app.put("/books/:id", async (req, res, next) => {
 
 app.delete("/books/:id", async (req, res, next) => {
   try {
-    const booksCollection = db.collection("books");
-    const id = new ObjectId(req.params.id);
-    const result = await booksCollection.deleteOne({ _id: id });
+    const id = parseObjectId(req.params.id);
+    if (!id) {
+      return res.status(400).json({ error: "Invalid book id" });
+    }
+
+    const result = await getBooksCollection().deleteOne({ _id: id });
     if (result.deletedCount === 0) {
       return res.status(404).json({ error: "Book not found" });
     }
+
     res.json({ message: "Book deleted" });
   } catch (err) {
     next(err);
   }
 });
 
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ error: "Internal server error" });
+});
+
 async function startServer() {
   try {
     db = await connectDB();
+
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
