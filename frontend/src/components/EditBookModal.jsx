@@ -23,33 +23,20 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
 
   function validateForm() {
     const nextErrors = {};
-
-    if (!form.title.trim()) {
-      nextErrors.title = "Title is required";
-    }
-
-    if (!form.author.trim()) {
-      nextErrors.author = "Author is required";
-    }
-
+    if (!form.title.trim()) nextErrors.title = "Title is required";
+    if (!form.author.trim()) nextErrors.author = "Author is required";
     return nextErrors;
   }
 
   function handleChange(field) {
     return (e) => {
-      setForm((prev) => ({
-        ...prev,
-        [field]: e.target.value,
-      }));
-
+      setForm((prev) => ({ ...prev, [field]: e.target.value }));
       if (serverError) setServerError(null);
     };
   }
 
   async function handleSubmit() {
-    if (!book) {
-      return;
-    }
+    if (!book) return;
 
     const nextErrors = validateForm();
     if (Object.keys(nextErrors).length > 0) {
@@ -80,7 +67,6 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
 
   function handleClose() {
     if (saving) return;
-
     setServerError(null);
     onClose();
   }
@@ -89,7 +75,7 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <Box sx={getModalSurfaceSx({ xs: "calc(100% - 32px)", sm: 520 })}>
+      <Box sx={getModalSurfaceSx({ xs: "calc(100% - 32px)", sm: 560 })}>
         <Box
           sx={{
             display: "flex",
@@ -97,32 +83,54 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
             gap: 1.25,
             px: 3,
             py: 2.25,
-            borderBottom: "1px solid #e8eaed",
+            borderBottom: "1px solid rgba(124,77,43,0.10)",
+            background:
+              "linear-gradient(135deg, rgba(68,109,91,0.06), rgba(124,77,43,0.04))",
           }}
         >
-          <EditIcon sx={{ color: "#1a73e8", fontSize: 22 }} />
-
-          <Typography
+          <Box
             sx={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontWeight: 700,
-              fontSize: "1.05rem",
-              color: "#202124",
-              flex: 1,
+              width: 40,
+              height: 40,
+              borderRadius: "14px",
+              display: "grid",
+              placeItems: "center",
+              backgroundColor: "rgba(68,109,91,0.10)",
+              border: "1px solid rgba(68,109,91,0.12)",
             }}
           >
-            Edit book
-          </Typography>
-
+            <EditIcon sx={{ color: "#446d5b", fontSize: 22 }} />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              sx={{
+                fontFamily: "'Fraunces', serif",
+                fontWeight: 700,
+                fontSize: "1.15rem",
+                color: "#24180f",
+                lineHeight: 1.05,
+              }}
+            >
+              Edit book
+            </Typography>
+            <Typography
+              sx={{
+                mt: 0.4,
+                fontFamily: "'Manrope', sans-serif",
+                fontSize: "0.82rem",
+                color: "#7b6757",
+              }}
+            >
+              Refine the record without losing the book’s place on the shelf.
+            </Typography>
+          </Box>
           <IconButton
             size="small"
             onClick={handleClose}
             disabled={saving}
             sx={{
-              color: "#5f6368",
-              "&:hover": {
-                backgroundColor: "#f1f3f4",
-              },
+              color: "#6b5847",
+              "&:hover": { backgroundColor: "rgba(124,77,43,0.10)" },
             }}
           >
             <CloseIcon fontSize="small" />
@@ -147,7 +155,6 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
             size="small"
             sx={inputSx}
           />
-
           <TextField
             label="Author"
             value={form.author}
@@ -156,7 +163,6 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
             size="small"
             sx={inputSx}
           />
-
           <Box sx={{ display: "flex", gap: 2 }}>
             <TextField
               label="Year"
@@ -165,12 +171,8 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
               type="number"
               size="small"
               sx={{ ...inputSx, flex: 1 }}
-              inputProps={{
-                min: 1,
-                max: new Date().getFullYear(),
-              }}
+              inputProps={{ min: 1, max: new Date().getFullYear() }}
             />
-
             <TextField
               select
               label="Genre"
@@ -187,16 +189,8 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
               }}
             >
               <MenuItem value="">
-                <em
-                  style={{
-                    color: "#80868b",
-                    fontStyle: "normal",
-                  }}
-                >
-                  None
-                </em>
+                <em style={{ color: "#8a755f", fontStyle: "normal" }}>None</em>
               </MenuItem>
-
               {BOOK_GENRES.map((g) => (
                 <MenuItem key={g} value={g}>
                   {g}
@@ -214,14 +208,15 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
             fullWidth
             size="small"
             sx={inputSx}
+            placeholder="What should future-you remember about this book?"
           />
 
           {serverError && (
             <Typography
               sx={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Manrope', sans-serif",
                 fontSize: "0.8rem",
-                color: "#c5221f",
+                color: "#8f3d2f",
               }}
             >
               {serverError}
@@ -240,15 +235,15 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
               onClick={handleClose}
               disabled={saving}
               sx={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 600,
+                fontFamily: "'Manrope', sans-serif",
+                fontWeight: 800,
                 fontSize: "0.875rem",
                 textTransform: "none",
-                color: "#5f6368",
-                borderRadius: "8px",
+                color: "#6b5847",
+                borderRadius: "12px",
                 px: 2,
                 "&:hover": {
-                  backgroundColor: "#f1f3f4",
+                  backgroundColor: "rgba(124,77,43,0.08)",
                 },
               }}
             >
@@ -261,29 +256,27 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
               variant="contained"
               disableElevation
               sx={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 600,
+                fontFamily: "'Manrope', sans-serif",
+                fontWeight: 800,
                 fontSize: "0.875rem",
                 textTransform: "none",
-                borderRadius: "8px",
+                borderRadius: "12px",
                 px: 2.5,
-                backgroundColor: "#1a73e8",
+                background:
+                  "linear-gradient(135deg, #446d5b 0%, #5e8875 100%)",
                 "&:hover": {
-                  backgroundColor: "#1765cc",
+                  background:
+                    "linear-gradient(135deg, #34584a 0%, #4f7563 100%)",
                 },
                 "&:disabled": {
-                  backgroundColor: "#c5d9fb",
+                  backgroundColor: "#c9d8d1",
                   color: "#fff",
                 },
                 minWidth: 92,
               }}
             >
               {saving ? (
-                <CircularProgress
-                  size={16}
-                  thickness={4}
-                  sx={{ color: "#fff" }}
-                />
+                <CircularProgress size={16} thickness={4} sx={{ color: "#fff" }} />
               ) : (
                 "Save"
               )}
