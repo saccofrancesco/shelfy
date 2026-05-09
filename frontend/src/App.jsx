@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Navbar from "./components/Navbar";
 import BooksContainer from "./components/BooksContainer";
+import { Box } from "@mui/material";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -12,7 +13,27 @@ function App() {
   }
 
   return (
-    <>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        position: "relative",
+        overflowX: "hidden",
+        color: "#24180f",
+      }}
+    >
+      <Box
+        aria-hidden
+        sx={{
+          position: "fixed",
+          inset: 0,
+          pointerEvents: "none",
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.38) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.24) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+          maskImage:
+            "linear-gradient(180deg, rgba(0,0,0,0.14) 0%, rgba(0,0,0,0.03) 45%, transparent 100%)",
+        }}
+      />
       <Navbar
         searchQuery={searchQuery}
         onSearch={setSearchQuery}
@@ -25,7 +46,7 @@ function App() {
         searchField={searchField}
         refreshKey={refreshKey}
       />
-    </>
+    </Box>
   );
 }
 
