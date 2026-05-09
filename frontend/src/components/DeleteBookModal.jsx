@@ -10,6 +10,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
 import http from "../lib/http";
+import { getModalSurfaceSx } from "./bookModalStyles";
 
 function DeleteBookModal({ open, onClose, book, onBookDeleted }) {
   const [deleting, setDeleting] = useState(false);
@@ -19,9 +20,7 @@ function DeleteBookModal({ open, onClose, book, onBookDeleted }) {
     try {
       setDeleting(true);
       setServerError(null);
-
       await http.delete(`/books/${book._id}`);
-
       onBookDeleted?.(book._id);
       handleClose();
     } catch {
@@ -33,7 +32,6 @@ function DeleteBookModal({ open, onClose, book, onBookDeleted }) {
 
   function handleClose() {
     if (deleting) return;
-
     setServerError(null);
     onClose();
   }
@@ -42,21 +40,7 @@ function DeleteBookModal({ open, onClose, book, onBookDeleted }) {
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: { xs: "calc(100% - 32px)", sm: 440 },
-          backgroundColor: "#fff",
-          borderRadius: "16px",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.14)",
-          outline: "none",
-          overflow: "hidden",
-        }}
-      >
-        {/* Header */}
+      <Box sx={getModalSurfaceSx({ xs: "calc(100% - 32px)", sm: 460 })}>
         <Box
           sx={{
             display: "flex",
@@ -64,80 +48,83 @@ function DeleteBookModal({ open, onClose, book, onBookDeleted }) {
             gap: 1.25,
             px: 3,
             py: 2.25,
-            borderBottom: "1px solid #e8eaed",
+            borderBottom: "1px solid rgba(124,77,43,0.10)",
+            background:
+              "linear-gradient(135deg, rgba(143,61,47,0.06), rgba(124,77,43,0.04))",
           }}
         >
-          <DeleteIcon
+          <Box
             sx={{
-              color: "#c5221f",
-              fontSize: 22,
-            }}
-          />
-
-          <Typography
-            sx={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontWeight: 700,
-              fontSize: "1.05rem",
-              color: "#202124",
-              flex: 1,
+              width: 40,
+              height: 40,
+              borderRadius: "14px",
+              display: "grid",
+              placeItems: "center",
+              backgroundColor: "rgba(143,61,47,0.10)",
+              border: "1px solid rgba(143,61,47,0.14)",
             }}
           >
-            Delete book
-          </Typography>
-
+            <DeleteIcon sx={{ color: "#8f3d2f", fontSize: 22 }} />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              sx={{
+                fontFamily: "'Fraunces', serif",
+                fontWeight: 700,
+                fontSize: "1.15rem",
+                color: "#24180f",
+                lineHeight: 1.05,
+              }}
+            >
+              Remove from shelf?
+            </Typography>
+            <Typography
+              sx={{
+                mt: 0.4,
+                fontFamily: "'Manrope', sans-serif",
+                fontSize: "0.82rem",
+                color: "#7b6757",
+              }}
+            >
+              This will delete the record for this copy.
+            </Typography>
+          </Box>
           <IconButton
             size="small"
             onClick={handleClose}
             disabled={deleting}
             sx={{
-              color: "#5f6368",
-              "&:hover": {
-                backgroundColor: "#f1f3f4",
-              },
+              color: "#6b5847",
+              "&:hover": { backgroundColor: "rgba(124,77,43,0.10)" },
             }}
           >
             <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
 
-        {/* Body */}
-        <Box
-          sx={{
-            px: 3,
-            pt: 3,
-            pb: 3,
-          }}
-        >
+        <Box sx={{ px: 3, pt: 3, pb: 3 }}>
           <Typography
             sx={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "0.92rem",
-              color: "#3c4043",
-              lineHeight: 1.6,
+              fontFamily: "'Manrope', sans-serif",
+              fontSize: "0.95rem",
+              color: "#3d3025",
+              lineHeight: 1.7,
             }}
           >
-            Are you sure you want to delete
-            <Box
-              component="span"
-              sx={{
-                fontWeight: 700,
-                color: "#202124",
-              }}
-            >
-              {" "}
-              "{book.title}"
-            </Box>
-            ?
+            Remove{" "}
+            <Box component="span" sx={{ fontWeight: 800, color: "#24180f" }}>
+              “{book.title}”
+            </Box>{" "}
+            from Shelfy? You can add it again later, but this entry will leave
+            the shelf.
           </Typography>
 
           <Typography
             sx={{
               mt: 1,
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Manrope', sans-serif",
               fontSize: "0.82rem",
-              color: "#80868b",
-              lineHeight: 1.5,
+              color: "#7b6757",
             }}
           >
             This action cannot be undone.
@@ -147,16 +134,15 @@ function DeleteBookModal({ open, onClose, book, onBookDeleted }) {
             <Typography
               sx={{
                 mt: 2,
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Manrope', sans-serif",
                 fontSize: "0.8rem",
-                color: "#c5221f",
+                color: "#8f3d2f",
               }}
             >
               {serverError}
             </Typography>
           )}
 
-          {/* Actions */}
           <Box
             sx={{
               display: "flex",
@@ -169,15 +155,15 @@ function DeleteBookModal({ open, onClose, book, onBookDeleted }) {
               onClick={handleClose}
               disabled={deleting}
               sx={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 600,
+                fontFamily: "'Manrope', sans-serif",
+                fontWeight: 800,
                 fontSize: "0.875rem",
                 textTransform: "none",
-                color: "#5f6368",
-                borderRadius: "8px",
+                color: "#6b5847",
+                borderRadius: "12px",
                 px: 2,
                 "&:hover": {
-                  backgroundColor: "#f1f3f4",
+                  backgroundColor: "rgba(124,77,43,0.08)",
                 },
               }}
             >
@@ -190,29 +176,27 @@ function DeleteBookModal({ open, onClose, book, onBookDeleted }) {
               variant="contained"
               disableElevation
               sx={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 600,
+                fontFamily: "'Manrope', sans-serif",
+                fontWeight: 800,
                 fontSize: "0.875rem",
                 textTransform: "none",
-                borderRadius: "8px",
+                borderRadius: "12px",
                 px: 2.5,
-                backgroundColor: "#c5221f",
+                background:
+                  "linear-gradient(135deg, #8f3d2f 0%, #b05746 100%)",
                 "&:hover": {
-                  backgroundColor: "#a50e0e",
+                  background:
+                    "linear-gradient(135deg, #7b3126 0%, #a04839 100%)",
                 },
                 "&:disabled": {
-                  backgroundColor: "#f3c7c5",
+                  backgroundColor: "#dfb7af",
                   color: "#fff",
                 },
-                minWidth: 92,
+                minWidth: 104,
               }}
             >
               {deleting ? (
-                <CircularProgress
-                  size={16}
-                  thickness={4}
-                  sx={{ color: "#fff" }}
-                />
+                <CircularProgress size={16} thickness={4} sx={{ color: "#fff" }} />
               ) : (
                 "Delete"
               )}
