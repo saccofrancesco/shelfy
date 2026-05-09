@@ -1,34 +1,38 @@
 export const inputSx = {
   "& .MuiOutlinedInput-root": {
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "0.9rem",
-    borderRadius: "10px",
-    backgroundColor: "#fafafa",
-    transition: "background-color 0.15s",
-    "& fieldset": { borderColor: "#e0e0e0" },
-    "&:hover fieldset": { borderColor: "#bdc1c6" },
+    fontFamily: "'Manrope', sans-serif",
+    fontSize: "0.92rem",
+    borderRadius: "14px",
+    backgroundColor: "rgba(255,250,243,0.9)",
+    transition: "background-color 0.15s, transform 0.15s, box-shadow 0.15s",
+    "& fieldset": { borderColor: "rgba(124,77,43,0.14)" },
+    "&:hover fieldset": { borderColor: "rgba(124,77,43,0.28)" },
     "&.Mui-focused": {
-      backgroundColor: "#fff",
-      "& fieldset": { borderColor: "#1a73e8", borderWidth: "1.5px" },
+      backgroundColor: "#fffaf3",
+      boxShadow: "0 0 0 4px rgba(124,77,43,0.08)",
+      "& fieldset": { borderColor: "#7c4d2b", borderWidth: "1.5px" },
     },
   },
   "& .MuiInputLabel-root": {
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "0.875rem",
-    color: "#80868b",
-    "&.Mui-focused": { color: "#1a73e8" },
+    fontFamily: "'Manrope', sans-serif",
+    fontSize: "0.88rem",
+    color: "#8a755f",
+    "&.Mui-focused": { color: "#7c4d2b" },
   },
   "& .MuiFormHelperText-root": {
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Manrope', sans-serif",
     fontSize: "0.75rem",
+    marginLeft: 0,
   },
 };
 
 export const menuPaperSx = {
-  borderRadius: "10px",
-  boxShadow: "0 4px 20px rgba(0,0,0,0.10)",
+  borderRadius: "16px",
+  boxShadow: "0 20px 40px rgba(69,48,30,0.12)",
+  border: "1px solid rgba(124,77,43,0.12)",
+  backgroundColor: "#fffaf3",
   "& .MuiMenuItem-root": {
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Manrope', sans-serif",
     fontSize: "0.875rem",
   },
 };
@@ -40,10 +44,13 @@ export function getModalSurfaceSx(width) {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width,
-    backgroundColor: "#fff",
-    borderRadius: "16px",
-    boxShadow: "0 8px 40px rgba(0,0,0,0.14)",
+    maxHeight: "min(88vh, 900px)",
+    background:
+      "linear-gradient(180deg, rgba(255,250,243,0.98), rgba(247,238,228,0.98))",
+    borderRadius: "24px",
+    boxShadow: "0 28px 70px rgba(69,48,30,0.24)",
     outline: "none",
     overflow: "hidden",
+    border: "1px solid rgba(124,77,43,0.12)",
   };
 }
