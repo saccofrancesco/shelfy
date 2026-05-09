@@ -9,7 +9,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import { useState } from "react";
 import axios from "axios";
 import { BOOK_GENRES } from "../constants/books";
@@ -40,18 +40,12 @@ function AddBookModal({ open, onClose, onBookAdded }) {
   function validateForm() {
     const nextErrors = {};
 
-    if (!form.title.trim()) {
-      nextErrors.title = "Title is required";
-    }
-
-    if (!form.author.trim()) {
-      nextErrors.author = "Author is required";
-    }
+    if (!form.title.trim()) nextErrors.title = "Title is required";
+    if (!form.author.trim()) nextErrors.author = "Author is required";
 
     if (form.year) {
       const parsedYear = Number(form.year);
       const currentYear = new Date().getFullYear();
-
       if (
         !Number.isInteger(parsedYear) ||
         parsedYear < 1 ||
@@ -74,9 +68,7 @@ function AddBookModal({ open, onClose, onBookAdded }) {
   }
 
   async function handleSubmit() {
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       setSaving(true);
@@ -111,7 +103,7 @@ function AddBookModal({ open, onClose, onBookAdded }) {
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <Box sx={getModalSurfaceSx({ xs: "calc(100% - 32px)", sm: 520 })}>
+      <Box sx={getModalSurfaceSx({ xs: "calc(100% - 32px)", sm: 560 })}>
         <Box
           sx={{
             display: "flex",
@@ -119,25 +111,54 @@ function AddBookModal({ open, onClose, onBookAdded }) {
             gap: 1.25,
             px: 3,
             py: 2.25,
-            borderBottom: "1px solid #e8eaed",
+            borderBottom: "1px solid rgba(124,77,43,0.10)",
+            background:
+              "linear-gradient(135deg, rgba(124,77,43,0.06), rgba(68,109,91,0.04))",
           }}
         >
-          <AutoStoriesIcon sx={{ color: "#1a73e8", fontSize: 22 }} />
-          <Typography
+          <Box
             sx={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontWeight: 700,
-              fontSize: "1.05rem",
-              color: "#202124",
-              flex: 1,
+              width: 40,
+              height: 40,
+              borderRadius: "14px",
+              display: "grid",
+              placeItems: "center",
+              backgroundColor: "rgba(124,77,43,0.10)",
+              border: "1px solid rgba(124,77,43,0.12)",
             }}
           >
-            Add new book
-          </Typography>
+            <LibraryAddIcon sx={{ color: "#7c4d2b", fontSize: 22 }} />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              sx={{
+                fontFamily: "'Fraunces', serif",
+                fontWeight: 700,
+                fontSize: "1.15rem",
+                color: "#24180f",
+                lineHeight: 1.05,
+              }}
+            >
+              Add a book
+            </Typography>
+            <Typography
+              sx={{
+                mt: 0.4,
+                fontFamily: "'Manrope', sans-serif",
+                fontSize: "0.82rem",
+                color: "#7b6757",
+              }}
+            >
+              We’ll try to find a cover automatically after you save.
+            </Typography>
+          </Box>
           <IconButton
             size="small"
             onClick={handleClose}
-            sx={{ color: "#5f6368", "&:hover": { backgroundColor: "#f1f3f4" } }}
+            sx={{
+              color: "#6b5847",
+              "&:hover": { backgroundColor: "rgba(124,77,43,0.10)" },
+            }}
           >
             <CloseIcon fontSize="small" />
           </IconButton>
@@ -163,7 +184,6 @@ function AddBookModal({ open, onClose, onBookAdded }) {
             size="small"
             sx={inputSx}
           />
-
           <TextField
             label="Author"
             value={form.author}
@@ -174,7 +194,6 @@ function AddBookModal({ open, onClose, onBookAdded }) {
             size="small"
             sx={inputSx}
           />
-
           <Box sx={{ display: "flex", gap: 2 }}>
             <TextField
               label="Year"
@@ -203,7 +222,7 @@ function AddBookModal({ open, onClose, onBookAdded }) {
               }}
             >
               <MenuItem value="">
-                <em style={{ color: "#80868b", fontStyle: "normal" }}>None</em>
+                <em style={{ color: "#8a755f", fontStyle: "normal" }}>None</em>
               </MenuItem>
               {BOOK_GENRES.map((g) => (
                 <MenuItem key={g} value={g}>
@@ -222,14 +241,15 @@ function AddBookModal({ open, onClose, onBookAdded }) {
             fullWidth
             size="small"
             sx={inputSx}
+            placeholder="A line or two about the themes, mood, or why it matters to you."
           />
 
           {serverError && (
             <Typography
               sx={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Manrope', sans-serif",
                 fontSize: "0.8rem",
-                color: "#c5221f",
+                color: "#8f3d2f",
               }}
             >
               {serverError}
@@ -248,15 +268,15 @@ function AddBookModal({ open, onClose, onBookAdded }) {
               onClick={handleClose}
               disabled={saving}
               sx={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 600,
+                fontFamily: "'Manrope', sans-serif",
+                fontWeight: 800,
                 fontSize: "0.875rem",
                 textTransform: "none",
-                color: "#5f6368",
-                borderRadius: "8px",
+                color: "#6b5847",
+                borderRadius: "12px",
                 px: 2,
                 "&:hover": {
-                  backgroundColor: "#f1f3f4",
+                  backgroundColor: "rgba(124,77,43,0.08)",
                 },
               }}
             >
@@ -269,29 +289,27 @@ function AddBookModal({ open, onClose, onBookAdded }) {
               variant="contained"
               disableElevation
               sx={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 600,
+                fontFamily: "'Manrope', sans-serif",
+                fontWeight: 800,
                 fontSize: "0.875rem",
                 textTransform: "none",
-                borderRadius: "8px",
+                borderRadius: "12px",
                 px: 2.5,
-                backgroundColor: "#1a73e8",
+                background:
+                  "linear-gradient(135deg, #7c4d2b 0%, #9a6944 100%)",
                 "&:hover": {
-                  backgroundColor: "#1765cc",
+                  background:
+                    "linear-gradient(135deg, #6d4124 0%, #8a5b38 100%)",
                 },
                 "&:disabled": {
-                  backgroundColor: "#c5d9fb",
+                  backgroundColor: "#d8c1b1",
                   color: "#fff",
                 },
                 minWidth: 92,
               }}
             >
               {saving ? (
-                <CircularProgress
-                  size={16}
-                  thickness={4}
-                  sx={{ color: "#fff" }}
-                />
+                <CircularProgress size={16} thickness={4} sx={{ color: "#fff" }} />
               ) : (
                 "Save"
               )}
