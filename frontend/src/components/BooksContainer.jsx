@@ -1,18 +1,13 @@
-import {
-  Box,
-  Typography,
-  CircularProgress,
-  Stack,
-  Paper,
-} from "@mui/material";
+import { Box, Typography, CircularProgress, Stack, Paper } from "@mui/material";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import BookCard from "./BookCard";
 import EditBookModal from "./EditBookModal";
 import DeleteBookModal from "./DeleteBookModal";
-import { useState, useEffect } from "react";
-import axios from "axios";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import http from "../lib/http";
+import { uiTokens } from "../theme";
 
 function BooksContainer({ searchQuery, searchField, refreshKey }) {
   const [books, setBooks] = useState([]);
@@ -31,21 +26,14 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
         setLoading(true);
         setErr(null);
         const response = await http.get("/books", {
-          params: {
-            q: debouncedQuery,
-            field: searchField,
-          },
+          params: { q: debouncedQuery, field: searchField },
           signal: controller.signal,
         });
         setBooks(response.data);
       } catch (e) {
-        if (!axios.isCancel(e)) {
-          setErr(e);
-        }
+        if (!axios.isCancel(e)) setErr(e);
       } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
     fetchBooks();
@@ -63,9 +51,7 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
   }
 
   function handleBookUpdated(updatedBook) {
-    setBooks((prev) =>
-      prev.map((b) => (b._id === updatedBook._id ? updatedBook : b)),
-    );
+    setBooks((prev) => prev.map((b) => (b._id === updatedBook._id ? updatedBook : b)));
   }
 
   function handleBookDeleted(bookId) {
@@ -76,23 +62,16 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
 
   return (
     <>
-      <Box
-        sx={{
-          maxWidth: 1320,
-          mx: "auto",
-          px: { xs: 2, sm: 3, md: 4 },
-          py: { xs: 3, md: 4 },
-        }}
-      >
+      <Box sx={{ maxWidth: 1320, mx: "auto", px: { xs: 2, sm: 3, md: 4 }, py: { xs: 3, md: 4 } }}>
         <Paper
           elevation={0}
           sx={{
             mb: 3,
-            borderRadius: "24px",
-            border: "1px solid rgba(124,77,43,0.10)",
+            borderRadius: `${uiTokens.radius.lg}px`,
+            border: `1px solid ${uiTokens.border.subtle}`,
             background:
-              "linear-gradient(135deg, rgba(255,250,243,0.96), rgba(247,238,228,0.92))",
-            boxShadow: "0 22px 50px rgba(69,48,30,0.08)",
+              "linear-gradient(135deg, rgba(255,252,247,0.96), rgba(247,238,228,0.92))",
+            boxShadow: uiTokens.shadow.soft,
             overflow: "hidden",
           }}
         >
@@ -109,9 +88,8 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
               <Typography
                 variant="h1"
                 sx={{
-                  fontSize: { xs: "2.1rem", md: "3.15rem" },
+                  fontSize: { xs: "2.05rem", md: "3.1rem" },
                   lineHeight: 0.98,
-                  color: "#24180f",
                   letterSpacing: "-0.04em",
                   mb: 1.2,
                 }}
@@ -121,85 +99,29 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
               <Typography
                 sx={{
                   maxWidth: 640,
-                  fontFamily: "'Manrope', sans-serif",
                   fontSize: { xs: "0.98rem", md: "1.03rem" },
                   lineHeight: 1.7,
-                  color: "#665547",
+                  color: uiTokens.color.muted,
                 }}
               >
-                Search by {searchField}, add a new title, or shape the archive
-                into a collection that feels personal instead of procedural.
+                Search by {searchField}, add a new title, or shape the archive into a collection that feels personal instead of procedural.
               </Typography>
             </Box>
 
-            <Stack
-              direction="row"
-              spacing={1.2}
-              justifyContent={{ xs: "flex-start", md: "flex-end" }}
-              flexWrap="wrap"
-            >
-              <Box
-                sx={{
-                  px: 2,
-                  py: 1.2,
-                  borderRadius: "18px",
-                  backgroundColor: "rgba(124,77,43,0.08)",
-                  border: "1px solid rgba(124,77,43,0.12)",
-                  minWidth: 132,
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontSize: "0.75rem",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.12em",
-                    color: "#8a755f",
-                    mb: 0.35,
-                  }}
-                >
+            <Stack direction="row" spacing={1.2} justifyContent={{ xs: "flex-start", md: "flex-end" }} flexWrap="wrap">
+              <Box sx={{ px: 2, py: 1.2, borderRadius: "18px", backgroundColor: "rgba(124,77,43,0.08)", border: `1px solid ${uiTokens.border.subtle}`, minWidth: 132 }}>
+                <Typography sx={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.12em", color: uiTokens.color.soft, mb: 0.35 }}>
                   Books
                 </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "'Fraunces', serif",
-                    fontSize: "1.7rem",
-                    color: "#24180f",
-                    lineHeight: 1,
-                  }}
-                >
+                <Typography sx={{ fontFamily: "'Fraunces', serif", fontSize: "1.7rem", lineHeight: 1 }}>
                   {books.length}
                 </Typography>
               </Box>
-
-              <Box
-                sx={{
-                  px: 2,
-                  py: 1.2,
-                  borderRadius: "18px",
-                  backgroundColor: "rgba(68,109,91,0.08)",
-                  border: "1px solid rgba(68,109,91,0.12)",
-                  minWidth: 132,
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontSize: "0.75rem",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.12em",
-                    color: "#5f7d6d",
-                    mb: 0.35,
-                  }}
-                >
+              <Box sx={{ px: 2, py: 1.2, borderRadius: "18px", backgroundColor: "rgba(68,109,91,0.08)", border: `1px solid rgba(68,109,91,0.12)`, minWidth: 132 }}>
+                <Typography sx={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.12em", color: uiTokens.color.accent2, mb: 0.35 }}>
                   Filter
                 </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "'Fraunces', serif",
-                    fontSize: "1.05rem",
-                    color: "#24180f",
-                    lineHeight: 1.2,
-                  }}
-                >
+                <Typography sx={{ fontFamily: "'Fraunces', serif", fontSize: "1.05rem", lineHeight: 1.2 }}>
                   {searchField === "title" ? "Titles" : "Authors"}
                 </Typography>
               </Box>
@@ -209,25 +131,14 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
 
         {loading && (
           <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-            <CircularProgress
-              size={42}
-              thickness={3.5}
-              sx={{ color: "#7c4d2b" }}
-            />
+            <CircularProgress size={42} thickness={3.5} sx={{ color: uiTokens.color.accent }} />
           </Box>
         )}
 
         {!loading && err && (
           <Box sx={{ textAlign: "center", mt: 10 }}>
-            <Typography
-              sx={{
-                fontFamily: "'Manrope', sans-serif",
-                fontSize: "0.98rem",
-                color: "#8f3d2f",
-              }}
-            >
-              We couldn&apos;t load your shelf right now. Check your connection
-              and try again.
+            <Typography sx={{ fontSize: "0.98rem", color: uiTokens.color.danger }}>
+              We couldn&apos;t load your shelf right now. Check your connection and try again.
             </Typography>
           </Box>
         )}
@@ -236,71 +147,27 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
           <Paper
             elevation={0}
             sx={{
-              borderRadius: "26px",
-              border: "1px solid rgba(124,77,43,0.10)",
+              borderRadius: `${uiTokens.radius.lg}px`,
+              border: `1px solid ${uiTokens.border.subtle}`,
               background:
-                "linear-gradient(160deg, rgba(255,250,243,0.95), rgba(242,230,214,0.84))",
-              boxShadow: "0 18px 40px rgba(69,48,30,0.08)",
+                "linear-gradient(160deg, rgba(255,252,247,0.95), rgba(242,230,214,0.84))",
+              boxShadow: uiTokens.shadow.soft,
               p: { xs: 3, md: 4 },
             }}
           >
-            <Box
-              sx={{
-                display: "grid",
-                placeItems: "center",
-                textAlign: "center",
-                gap: 1.4,
-                py: 3,
-              }}
-            >
-              <Box
-                sx={{
-                  width: 72,
-                  height: 72,
-                  borderRadius: "24px",
-                  display: "grid",
-                  placeItems: "center",
-                  background:
-                    "linear-gradient(135deg, rgba(124,77,43,0.12), rgba(68,109,91,0.12))",
-                  border: "1px solid rgba(124,77,43,0.14)",
-                }}
-              >
-                <SearchOffIcon sx={{ fontSize: 34, color: "#7c4d2b" }} />
+            <Box sx={{ display: "grid", placeItems: "center", textAlign: "center", gap: 1.4, py: 3 }}>
+              <Box sx={{ width: 72, height: 72, borderRadius: "24px", display: "grid", placeItems: "center", background: "linear-gradient(135deg, rgba(124,77,43,0.12), rgba(68,109,91,0.12))", border: `1px solid ${uiTokens.border.subtle}` }}>
+                <SearchOffIcon sx={{ fontSize: 34, color: uiTokens.color.accent }} />
               </Box>
-
-              <Typography
-                variant="h2"
-                sx={{
-                  fontSize: "1.8rem",
-                  color: "#24180f",
-                  letterSpacing: "-0.03em",
-                }}
-              >
+              <Typography variant="h2" sx={{ fontSize: "1.8rem", letterSpacing: "-0.03em" }}>
                 {hasQuery ? "Nothing matched this search." : "Your shelf is empty."}
               </Typography>
-
-              <Typography
-                sx={{
-                  maxWidth: 520,
-                  fontFamily: "'Manrope', sans-serif",
-                  fontSize: "0.97rem",
-                  lineHeight: 1.7,
-                  color: "#665547",
-                }}
-              >
+              <Typography sx={{ maxWidth: 520, fontSize: "0.97rem", lineHeight: 1.7, color: uiTokens.color.muted }}>
                 {hasQuery
                   ? `No ${searchField} matched "${debouncedQuery}". Try clearing the search or switching the filter.`
                   : "Add your first book and let the shelf start taking shape. Covers can be discovered automatically when possible."}
               </Typography>
-
-              <Typography
-                sx={{
-                  mt: 1,
-                  fontFamily: "'Manrope', sans-serif",
-                  fontSize: "0.84rem",
-                  color: "#8a755f",
-                }}
-              >
+              <Typography sx={{ mt: 1, fontSize: "0.84rem", color: uiTokens.color.soft }}>
                 Use the Add book button in the header to place the first title.
               </Typography>
             </Box>
@@ -317,12 +184,7 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
             }}
           >
             {books.map((book) => (
-              <BookCard
-                key={book._id}
-                book={book}
-                onEditClick={handleEditClick}
-                onDeleteClick={handleDeleteClick}
-              />
+              <BookCard key={book._id} book={book} onEditClick={handleEditClick} onDeleteClick={handleDeleteClick} />
             ))}
           </Box>
         )}
