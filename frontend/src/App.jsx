@@ -2,6 +2,7 @@ import { useState } from "react";
 import Navbar from "./components/Navbar";
 import BooksContainer from "./components/BooksContainer";
 import { Box } from "@mui/material";
+import { uiTokens } from "./theme";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,7 +19,7 @@ function App() {
         minHeight: "100vh",
         position: "relative",
         overflowX: "hidden",
-        color: "#24180f",
+        color: uiTokens.color.ink,
       }}
     >
       <Box
@@ -32,6 +33,7 @@ function App() {
           backgroundSize: "28px 28px",
           maskImage:
             "linear-gradient(180deg, rgba(0,0,0,0.14) 0%, rgba(0,0,0,0.03) 45%, transparent 100%)",
+          opacity: 0.35,
         }}
       />
       <Navbar
