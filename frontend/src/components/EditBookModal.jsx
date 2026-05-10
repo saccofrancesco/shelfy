@@ -14,7 +14,8 @@ import { useState } from "react";
 import { BOOK_GENRES } from "../constants/books";
 import { bookToForm } from "../lib/bookForm";
 import http from "../lib/http";
-import { getModalSurfaceSx, inputSx, menuPaperSx } from "./bookModalStyles";
+import { getModalSurfaceSx, inputSx, menuPaperSx } from "./ui";
+import { uiTokens } from "../theme";
 
 function EditBookModal({ open, onClose, book, onBookUpdated }) {
   const [form, setForm] = useState(() => bookToForm(book));
@@ -37,7 +38,6 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
 
   async function handleSubmit() {
     if (!book) return;
-
     const nextErrors = validateForm();
     if (Object.keys(nextErrors).length > 0) {
       setServerError("Title and author cannot be empty.");
@@ -47,7 +47,6 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
     try {
       setSaving(true);
       setServerError(null);
-
       const response = await http.put(`/books/${book._id}`, {
         title: form.title.trim(),
         author: form.author.trim(),
@@ -55,7 +54,6 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
         genre: form.genre.trim(),
         description: form.description.trim(),
       });
-
       onBookUpdated?.(response.data.book);
       handleClose();
     } catch {
@@ -75,211 +73,60 @@ function EditBookModal({ open, onClose, book, onBookUpdated }) {
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <Box sx={getModalSurfaceSx({ xs: "calc(100% - 32px)", sm: 560 })}>
+      <Box sx={getModalSurfaceSx({ xs: "calc(100% - 24px)", sm: 560 })}>
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             gap: 1.25,
-            px: 3,
+            px: { xs: 2, sm: 3 },
             py: 2.25,
-            borderBottom: "1px solid rgba(124,77,43,0.10)",
+            borderBottom: `1px solid ${uiTokens.border.subtle}`,
             background:
               "linear-gradient(135deg, rgba(68,109,91,0.06), rgba(124,77,43,0.04))",
           }}
         >
-          <Box
-            sx={{
-              width: 40,
-              height: 40,
-              borderRadius: "14px",
-              display: "grid",
-              placeItems: "center",
-              backgroundColor: "rgba(68,109,91,0.10)",
-              border: "1px solid rgba(68,109,91,0.12)",
-            }}
-          >
-            <EditIcon sx={{ color: "#446d5b", fontSize: 22 }} />
+          <Box sx={{ width: 40, height: 40, borderRadius: "14px", display: "grid", placeItems: "center", backgroundColor: "rgba(68,109,91,0.10)", border: `1px solid ${uiTokens.border.subtle}` }}>
+            <EditIcon sx={{ color: uiTokens.color.accent2, fontSize: 22 }} />
           </Box>
           <Box sx={{ flex: 1 }}>
-            <Typography
-              sx={{
-                fontFamily: "'Fraunces', serif",
-                fontWeight: 700,
-                fontSize: "1.15rem",
-                color: "#24180f",
-                lineHeight: 1.05,
-              }}
-            >
+            <Typography sx={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "1.15rem", color: uiTokens.color.ink, lineHeight: 1.05 }}>
               Edit book
             </Typography>
-            <Typography
-              sx={{
-                mt: 0.4,
-                fontFamily: "'Manrope', sans-serif",
-                fontSize: "0.82rem",
-                color: "#7b6757",
-              }}
-            >
+            <Typography sx={{ mt: 0.4, fontSize: "0.82rem", color: uiTokens.color.soft }}>
               Refine the record without losing the book’s place on the shelf.
             </Typography>
           </Box>
-          <IconButton
-            size="small"
-            onClick={handleClose}
-            disabled={saving}
-            sx={{
-              color: "#6b5847",
-              "&:hover": { backgroundColor: "rgba(124,77,43,0.10)" },
-            }}
-          >
+          <IconButton size="small" onClick={handleClose} disabled={saving} sx={{ color: uiTokens.color.muted, "&:hover": { backgroundColor: "rgba(124,77,43,0.10)" } }}>
             <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
 
-        <Box
-          sx={{
-            px: 3,
-            pt: 2.5,
-            pb: 3,
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
-          <TextField
-            label="Title"
-            value={form.title}
-            onChange={handleChange("title")}
-            fullWidth
-            size="small"
-            sx={inputSx}
-          />
-          <TextField
-            label="Author"
-            value={form.author}
-            onChange={handleChange("author")}
-            fullWidth
-            size="small"
-            sx={inputSx}
-          />
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <TextField
-              label="Year"
-              value={form.year}
-              onChange={handleChange("year")}
-              type="number"
-              size="small"
-              sx={{ ...inputSx, flex: 1 }}
-              inputProps={{ min: 1, max: new Date().getFullYear() }}
-            />
-            <TextField
-              select
-              label="Genre"
-              value={form.genre}
-              onChange={handleChange("genre")}
-              size="small"
-              sx={{ ...inputSx, flex: 2 }}
-              SelectProps={{
-                MenuProps: {
-                  PaperProps: {
-                    sx: menuPaperSx,
-                  },
-                },
-              }}
-            >
+        <Box sx={{ px: { xs: 2, sm: 3 }, pt: 2.5, pb: 3, display: "flex", flexDirection: "column", gap: 2 }}>
+          <TextField label="Title" value={form.title} onChange={handleChange("title")} sx={inputSx} />
+          <TextField label="Author" value={form.author} onChange={handleChange("author")} sx={inputSx} />
+          <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "1fr 1.4fr" } }}>
+            <TextField label="Year" value={form.year} onChange={handleChange("year")} type="number" sx={inputSx} inputProps={{ min: 1, max: new Date().getFullYear() }} />
+            <TextField select label="Genre" value={form.genre} onChange={handleChange("genre")} sx={inputSx} SelectProps={{ MenuProps: { PaperProps: { sx: menuPaperSx } } }}>
               <MenuItem value="">
-                <em style={{ color: "#8a755f", fontStyle: "normal" }}>None</em>
+                <em style={{ color: uiTokens.color.soft, fontStyle: "normal" }}>None</em>
               </MenuItem>
               {BOOK_GENRES.map((g) => (
-                <MenuItem key={g} value={g}>
-                  {g}
-                </MenuItem>
+                <MenuItem key={g} value={g}>{g}</MenuItem>
               ))}
             </TextField>
           </Box>
 
-          <TextField
-            label="Description"
-            value={form.description}
-            onChange={handleChange("description")}
-            multiline
-            rows={3}
-            fullWidth
-            size="small"
-            sx={inputSx}
-            placeholder="What should future-you remember about this book?"
-          />
+          <TextField label="Description" value={form.description} onChange={handleChange("description")} multiline rows={4} sx={inputSx} placeholder="What should future-you remember about this book?" />
 
-          {serverError && (
-            <Typography
-              sx={{
-                fontFamily: "'Manrope', sans-serif",
-                fontSize: "0.8rem",
-                color: "#8f3d2f",
-              }}
-            >
-              {serverError}
-            </Typography>
-          )}
+          {serverError && <Typography sx={{ fontSize: "0.82rem", color: uiTokens.color.danger }}>{serverError}</Typography>}
 
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: 1.25,
-              mt: 0.5,
-            }}
-          >
-            <Button
-              onClick={handleClose}
-              disabled={saving}
-              sx={{
-                fontFamily: "'Manrope', sans-serif",
-                fontWeight: 800,
-                fontSize: "0.875rem",
-                textTransform: "none",
-                color: "#6b5847",
-                borderRadius: "12px",
-                px: 2,
-                "&:hover": {
-                  backgroundColor: "rgba(124,77,43,0.08)",
-                },
-              }}
-            >
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.25, mt: 0.5, flexWrap: "wrap" }}>
+            <Button onClick={handleClose} disabled={saving} sx={{ fontWeight: 800, color: uiTokens.color.muted, borderRadius: "12px" }}>
               Cancel
             </Button>
-
-            <Button
-              onClick={handleSubmit}
-              disabled={saving}
-              variant="contained"
-              disableElevation
-              sx={{
-                fontFamily: "'Manrope', sans-serif",
-                fontWeight: 800,
-                fontSize: "0.875rem",
-                textTransform: "none",
-                borderRadius: "12px",
-                px: 2.5,
-                background:
-                  "linear-gradient(135deg, #446d5b 0%, #5e8875 100%)",
-                "&:hover": {
-                  background:
-                    "linear-gradient(135deg, #34584a 0%, #4f7563 100%)",
-                },
-                "&:disabled": {
-                  backgroundColor: "#c9d8d1",
-                  color: "#fff",
-                },
-                minWidth: 92,
-              }}
-            >
-              {saving ? (
-                <CircularProgress size={16} thickness={4} sx={{ color: "#fff" }} />
-              ) : (
-                "Save"
-              )}
+            <Button onClick={handleSubmit} disabled={saving} variant="contained" disableElevation sx={{ fontWeight: 800, borderRadius: "12px", background: "linear-gradient(135deg, #446d5b 0%, #5e8875 100%)", minWidth: 92 }}>
+              {saving ? <CircularProgress size={16} thickness={4} sx={{ color: "#fff" }} /> : "Save"}
             </Button>
           </Box>
         </Box>
