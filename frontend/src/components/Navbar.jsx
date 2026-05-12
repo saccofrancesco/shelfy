@@ -92,15 +92,6 @@ function Navbar({
                   >
                     Shelfy
                   </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: "0.8rem",
-                      color: uiTokens.color.soft,
-                      mt: 0.35,
-                    }}
-                  >
-                    A calm shelf for books worth keeping close
-                  </Typography>
                 </Box>
               </Box>
 
@@ -146,11 +137,16 @@ function Navbar({
                         backgroundColor: active
                           ? "rgba(124,77,43,0.12)"
                           : "rgba(255,250,243,0.82)",
-                        color: active ? uiTokens.color.accentDark : uiTokens.color.muted,
+                        color: active
+                          ? uiTokens.color.accentDark
+                          : uiTokens.color.muted,
                         border: `1px solid ${
-                          active ? "rgba(124,77,43,0.22)" : uiTokens.border.subtle
+                          active
+                            ? "rgba(124,77,43,0.22)"
+                            : uiTokens.border.subtle
                         }`,
-                        transition: "transform 180ms ease, background-color 180ms ease",
+                        transition:
+                          "transform 180ms ease, background-color 180ms ease",
                         "&:hover": {
                           transform: "translateY(-1px)",
                           backgroundColor: active
@@ -165,7 +161,10 @@ function Navbar({
 
               <Divider
                 flexItem
-                sx={{ display: { xs: "none", md: "block" }, borderColor: uiTokens.border.subtle }}
+                sx={{
+                  display: { xs: "none", md: "block" },
+                  borderColor: uiTokens.border.subtle,
+                }}
               />
 
               <Box
@@ -181,7 +180,8 @@ function Navbar({
                   backgroundColor: "rgba(255,250,243,0.86)",
                   border: `1px solid ${uiTokens.border.subtle}`,
                   boxShadow: uiTokens.shadow.soft,
-                  transition: "transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease",
+                  transition:
+                    "transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease",
                   "&:focus-within": {
                     transform: "translateY(-1px)",
                     borderColor: uiTokens.border.strong,
