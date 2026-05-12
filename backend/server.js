@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import connectDB from "./db.js";
 import {
   buildBooksFilter,
@@ -8,6 +10,11 @@ import {
 } from "./books.js";
 
 const PORT = Number(process.env.PORT ?? 3000);
+const ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_SECRET ?? "dev-access-secret";
+const REFRESH_TOKEN_SECRET =
+  process.env.JWT_REFRESH_SECRET ?? "dev-refresh-secret";
+const ACCESS_TOKEN_TTL = process.env.JWT_ACCESS_TTL ?? "15m";
+const REFRESH_TOKEN_TTL = process.env.JWT_REFRESH_TTL ?? "30d";
 const app = express();
 
 app.disable("x-powered-by");
@@ -19,6 +26,152 @@ let db;
 function getBooksCollection() {
   return db.collection("books");
 }
+
+function getAdminUsersCollection() {
+  return db.collection("admin_users");
+}
+
+function getRefreshTokensCollection() {
+  return db.collection("refresh_tokens");
+}
+
+function signAccessToken(user) {
+  return jwt.sign(
+    { sub: user._id.toString(), username: user.username, role: user.role },
+    ACCESS_TOKEN_SECRET,
+    { expiresIn: ACCESS_TOKEN_TTL },
+  );
+}
+
+function signRefreshToken(user) {
+  return jwt.sign(
+    { sub: user._id.toString(), tokenType: "refresh" },
+    REFRESH_TOKEN_SECRET,
+    { expiresIn: REFRESH_TOKEN_TTL },
+  );
+}
+
+function verifyAccessToken(req, res, next) {
+  const header = req.headers.authorization ?? "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : null;
+
+  if (!token) {
+    return res.status(401).json({ error: "Missing access token" });
+  }
+
+  try {
+    req.auth = jwt.verify(token, ACCESS_TOKEN_SECRET);
+    return next();
+  } catch {
+    return res.status(401).json({ error: "Invalid or expired access token" });
+  }
+}
+
+async function storeRefreshToken(userId, token) {
+  const decoded = jwt.decode(token);
+  if (!decoded?.exp) return;
+
+  await getRefreshTokensCollection().insertOne({
+    userId,
+    token,
+    expiresAt: new Date(decoded.exp * 1000),
+    createdAt: new Date(),
+  });
+}
+
+async function revokeRefreshToken(token) {
+  await getRefreshTokensCollection().deleteOne({ token });
+}
+
+app.post("/auth/login", async (req, res, next) => {
+  try {
+    const { username, password } = req.body ?? {};
+    if (!username || !password) {
+      return res.status(400).json({
+        error: "Username and password are required",
+      });
+    }
+
+    const user = await getAdminUsersCollection().findOne({
+      username: String(username).trim(),
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const passwordOk = await bcrypt.compare(String(password), user.passwordHash);
+    if (!passwordOk) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const accessToken = signAccessToken(user);
+    const refreshToken = signRefreshToken(user);
+    await storeRefreshToken(user._id.toString(), refreshToken);
+
+    res.json({
+      user: {
+        id: user._id,
+        username: user.username,
+        role: user.role ?? "admin",
+      },
+      accessToken,
+      refreshToken,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post("/auth/refresh", async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body ?? {};
+    if (!refreshToken) {
+      return res.status(400).json({ error: "Refresh token is required" });
+    }
+
+    const payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+    const tokenRecord = await getRefreshTokensCollection().findOne({
+      token: refreshToken,
+    });
+
+    if (!payload || !tokenRecord) {
+      return res.status(401).json({ error: "Invalid refresh token" });
+    }
+
+    const user = await getAdminUsersCollection().findOne({
+      _id: parseObjectId(payload.sub),
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: "Invalid refresh token" });
+    }
+
+    const accessToken = signAccessToken(user);
+    res.json({
+      accessToken,
+      user: {
+        id: user._id,
+        username: user.username,
+        role: user.role ?? "admin",
+      },
+    });
+  } catch (err) {
+    res.status(401).json({ error: "Invalid refresh token" });
+  }
+});
+
+app.post("/auth/logout", async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body ?? {};
+    if (refreshToken) {
+      await revokeRefreshToken(refreshToken);
+    }
+    res.json({ message: "Logged out" });
+  } catch (err) {
+    next(err);
+  }
+});
 
 app.get("/books", async (req, res, next) => {
   try {
@@ -34,7 +187,7 @@ app.get("/books", async (req, res, next) => {
   }
 });
 
-app.post("/books", async (req, res, next) => {
+app.post("/books", verifyAccessToken, async (req, res, next) => {
   try {
     const { book, errors } = normalizeBookPayload(req.body);
     if (Object.keys(errors).length > 0) {
@@ -58,7 +211,7 @@ app.post("/books", async (req, res, next) => {
   }
 });
 
-app.put("/books/:id", async (req, res, next) => {
+app.put("/books/:id", verifyAccessToken, async (req, res, next) => {
   try {
     const id = parseObjectId(req.params.id);
     if (!id) {
@@ -91,7 +244,7 @@ app.put("/books/:id", async (req, res, next) => {
   }
 });
 
-app.delete("/books/:id", async (req, res, next) => {
+app.delete("/books/:id", verifyAccessToken, async (req, res, next) => {
   try {
     const id = parseObjectId(req.params.id);
     if (!id) {
