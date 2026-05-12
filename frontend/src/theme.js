@@ -92,7 +92,8 @@ export const theme = createTheme({
         root: {
           borderRadius: uiTokens.radius.sm,
           paddingInline: "1rem",
-          transition: "transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease",
+          transition:
+            "transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease",
           "&:hover": {
             transform: "translateY(-1px)",
           },
