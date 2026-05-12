@@ -24,7 +24,8 @@ const chipColors = [
 
 function hashIndex(str = "", len) {
   let h = 0;
-  for (let i = 0; i < str.length; i += 1) h = (h * 31 + str.charCodeAt(i)) % len;
+  for (let i = 0; i < str.length; i += 1)
+    h = (h * 31 + str.charCodeAt(i)) % len;
   return h;
 }
 
@@ -44,7 +45,8 @@ function BookCard({ book, onEditClick, onDeleteClick }) {
         background:
           "linear-gradient(180deg, rgba(255,252,247,0.98), rgba(245,236,225,0.94))",
         boxShadow: uiTokens.shadow.soft,
-        transition: "transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease",
+        transition:
+          "transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease",
         "&:hover": {
           transform: "translateY(-4px)",
           boxShadow: uiTokens.shadow.medium,
@@ -107,7 +109,9 @@ function BookCard({ book, onEditClick, onDeleteClick }) {
                   boxShadow: uiTokens.shadow.soft,
                 }}
               >
-                <AutoStoriesIcon sx={{ fontSize: 28, color: uiTokens.color.accent }} />
+                <AutoStoriesIcon
+                  sx={{ fontSize: 28, color: uiTokens.color.accent }}
+                />
               </Box>
               <Typography
                 sx={{
