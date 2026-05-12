@@ -325,7 +325,7 @@ function Navbar({
           </ListItemIcon>
           <ListItemText
             primary="Log out"
-            primaryTypographyProps={{ fontWeight: 700, fontSize: "0.92rem" }}
+            primarytypographyprops={{ fontWeight: 700, fontSize: "0.92rem" }}
           />
         </MenuItem>
       </Menu>
