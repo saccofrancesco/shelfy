@@ -1,4 +1,4 @@
-import { Box, Typography, CircularProgress, Stack, Paper } from "@mui/material";
+import { Box, Typography, CircularProgress, Paper } from "@mui/material";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -9,7 +9,7 @@ import useDebouncedValue from "../hooks/useDebouncedValue";
 import http from "../lib/http";
 import { uiTokens } from "../theme";
 
-function BooksContainer({ searchQuery, searchField, refreshKey }) {
+function BooksContainer({ searchQuery, searchField, refreshKey, isAuthenticated }) {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
@@ -174,6 +174,7 @@ function BooksContainer({ searchQuery, searchField, refreshKey }) {
                 book={book}
                 onEditClick={handleEditClick}
                 onDeleteClick={handleDeleteClick}
+                canManage={isAuthenticated}
               />
             ))}
           </Box>
