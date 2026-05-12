@@ -18,7 +18,8 @@ export const inputSx = {
   "& .MuiOutlinedInput-root": {
     borderRadius: `${uiTokens.radius.sm}px`,
     backgroundColor: "rgba(255,250,243,0.92)",
-    transition: "box-shadow 180ms ease, border-color 180ms ease, transform 180ms ease",
+    transition:
+      "box-shadow 180ms ease, border-color 180ms ease, transform 180ms ease",
     "& fieldset": { borderColor: uiTokens.border.subtle },
     "&:hover fieldset": { borderColor: uiTokens.border.strong },
     "&.Mui-focused": {
