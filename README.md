@@ -31,3 +31,23 @@ If those variables are not set, the app falls back to `http://localhost:3000` an
 - `npm run dev --prefix frontend` starts the frontend only
 - `npm run lint --prefix frontend` runs the frontend lint rules
 - `npm run build --prefix frontend` builds the frontend for production
+
+## Admin login
+
+The app now supports admin-only login for book management.
+
+- `POST /auth/login` expects `username` and `password`
+- `POST /auth/refresh` exchanges a refresh token for a new access token
+- `POST /auth/logout` revokes a refresh token
+
+Create an admin user document in the backend database, for example:
+
+```js
+{
+  username: "admin",
+  passwordHash: "<bcrypt hash>",
+  role: "admin"
+}
+```
+
+Only authenticated users can add, edit, or delete books. Reading the shelf remains public.
