@@ -6,13 +6,20 @@ import {
   Chip,
   Button,
   Divider,
+  Avatar,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
 import AddIcon from "@mui/icons-material/Add";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { useState } from "react";
 import AddBookModal from "./AddBookModal";
+import AuthModal from "./AuthModal";
 import { SEARCH_FIELDS } from "../constants/books";
 import { uiTokens } from "../theme";
 
@@ -22,8 +29,33 @@ function Navbar({
   searchField,
   onFieldChange,
   onBookAdded,
+  isAuthenticated,
+  user,
+  onLogin,
+  onLogout,
 }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [accountAnchor, setAccountAnchor] = useState(null);
+
+  const accountMenuOpen = Boolean(accountAnchor);
+
+  function handleAccountClick(event) {
+    if (isAuthenticated) {
+      setAccountAnchor(event.currentTarget);
+      return;
+    }
+    setAuthOpen(true);
+  }
+
+  function handleAccountClose() {
+    setAccountAnchor(null);
+  }
+
+  function handleLogoutClick() {
+    handleAccountClose();
+    onLogout?.();
+  }
 
   return (
     <>
@@ -95,21 +127,53 @@ function Navbar({
                 </Box>
               </Box>
 
-              <Button
-                variant="contained"
-                disableElevation
-                startIcon={<AddIcon />}
-                onClick={() => setModalOpen(true)}
-                sx={{
-                  fontWeight: 800,
-                  borderRadius: `${uiTokens.radius.sm}px`,
-                  background:
-                    "linear-gradient(135deg, #7c4d2b 0%, #9a6944 100%)",
-                  boxShadow: uiTokens.shadow.soft,
-                }}
-              >
-                Add book
-              </Button>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {isAuthenticated && (
+                  <Button
+                    variant="contained"
+                    disableElevation
+                    startIcon={<AddIcon />}
+                    onClick={() => setModalOpen(true)}
+                    sx={{
+                      fontWeight: 800,
+                      borderRadius: `${uiTokens.radius.sm}px`,
+                      background:
+                        "linear-gradient(135deg, #7c4d2b 0%, #9a6944 100%)",
+                      boxShadow: uiTokens.shadow.soft,
+                    }}
+                  >
+                    Add book
+                  </Button>
+                )}
+                <IconButton
+                  onClick={handleAccountClick}
+                  aria-controls={accountMenuOpen ? "account-menu" : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={accountMenuOpen ? "true" : undefined}
+                  sx={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: "14px",
+                    border: `1px solid ${uiTokens.border.subtle}`,
+                    backgroundColor: "rgba(255,250,243,0.92)",
+                    boxShadow: uiTokens.shadow.soft,
+                  }}
+                >
+                  <Avatar
+                    sx={{
+                      width: 30,
+                      height: 30,
+                      bgcolor: isAuthenticated
+                        ? uiTokens.color.accent2
+                        : uiTokens.color.accent,
+                      fontSize: "0.88rem",
+                      fontWeight: 800,
+                    }}
+                  >
+                    {isAuthenticated ? (user?.username?.[0] ?? "A") : "?"}
+                  </Avatar>
+                </IconButton>
+              </Box>
             </Box>
 
             <Box
@@ -229,6 +293,42 @@ function Navbar({
         onClose={() => setModalOpen(false)}
         onBookAdded={onBookAdded}
       />
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onLogin={onLogin}
+      />
+      <Menu
+        id="account-menu"
+        anchorEl={accountAnchor}
+        open={accountMenuOpen}
+        onClose={handleAccountClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        slotProps={{
+          paper: {
+            sx: {
+              mt: 1,
+              minWidth: 180,
+              borderRadius: "16px",
+              border: `1px solid ${uiTokens.border.subtle}`,
+              boxShadow: uiTokens.shadow.medium,
+              backgroundColor: "rgba(255,250,243,0.98)",
+              overflow: "hidden",
+            },
+          },
+        }}
+      >
+        <MenuItem onClick={handleLogoutClick} sx={{ py: 1.1 }}>
+          <ListItemIcon sx={{ minWidth: 34 }}>
+            <LogoutIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary="Log out"
+            primaryTypographyProps={{ fontWeight: 700, fontSize: "0.92rem" }}
+          />
+        </MenuItem>
+      </Menu>
     </>
   );
 }
