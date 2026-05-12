@@ -29,7 +29,7 @@ function hashIndex(str = "", len) {
   return h;
 }
 
-function BookCard({ book, onEditClick, onDeleteClick }) {
+function BookCard({ book, onEditClick, onDeleteClick, canManage }) {
   const genreColor = chipColors[hashIndex(book.genre, chipColors.length)];
   const hasCover = Boolean(book.coverUrl);
 
@@ -204,53 +204,57 @@ function BookCard({ book, onEditClick, onDeleteClick }) {
         )}
       </CardContent>
 
-      <Divider sx={{ borderColor: uiTokens.border.subtle }} />
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          px: 1.2,
-          py: 0.9,
-          gap: 0.75,
-        }}
-      >
-        <Tooltip title="Edit" placement="top" arrow>
-          <IconButton
-            size="small"
-            aria-label={`Edit ${book.title}`}
-            onClick={() => onEditClick(book)}
+      {canManage && (
+        <>
+          <Divider sx={{ borderColor: uiTokens.border.subtle }} />
+          <Box
             sx={{
-              color: uiTokens.color.muted,
-              borderRadius: "12px",
-              "&:hover": {
-                backgroundColor: "rgba(124,77,43,0.10)",
-                color: uiTokens.color.accentDark,
-              },
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              px: 1.2,
+              py: 0.9,
+              gap: 0.75,
             }}
           >
-            <EditIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </Tooltip>
+            <Tooltip title="Edit" placement="top" arrow>
+              <IconButton
+                size="small"
+                aria-label={`Edit ${book.title}`}
+                onClick={() => onEditClick(book)}
+                sx={{
+                  color: uiTokens.color.muted,
+                  borderRadius: "12px",
+                  "&:hover": {
+                    backgroundColor: "rgba(124,77,43,0.10)",
+                    color: uiTokens.color.accentDark,
+                  },
+                }}
+              >
+                <EditIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </Tooltip>
 
-        <Tooltip title="Delete" placement="top" arrow>
-          <IconButton
-            size="small"
-            aria-label={`Delete ${book.title}`}
-            onClick={() => onDeleteClick(book)}
-            sx={{
-              color: uiTokens.color.muted,
-              borderRadius: "12px",
-              "&:hover": {
-                backgroundColor: "rgba(143,61,47,0.10)",
-                color: uiTokens.color.danger,
-              },
-            }}
-          >
-            <DeleteIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </Tooltip>
-      </Box>
+            <Tooltip title="Delete" placement="top" arrow>
+              <IconButton
+                size="small"
+                aria-label={`Delete ${book.title}`}
+                onClick={() => onDeleteClick(book)}
+                sx={{
+                  color: uiTokens.color.muted,
+                  borderRadius: "12px",
+                  "&:hover": {
+                    backgroundColor: "rgba(143,61,47,0.10)",
+                    color: uiTokens.color.danger,
+                  },
+                }}
+              >
+                <DeleteIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </>
+      )}
     </Card>
   );
 }
