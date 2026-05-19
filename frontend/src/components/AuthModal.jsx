@@ -61,30 +61,107 @@ function AuthModal({ open, onClose, onLogin }) {
               "linear-gradient(135deg, rgba(124,77,43,0.06), rgba(68,109,91,0.04))",
           }}
         >
-          <Box sx={{ width: 40, height: 40, borderRadius: "14px", display: "grid", placeItems: "center", backgroundColor: "rgba(124,77,43,0.10)", border: `1px solid ${uiTokens.border.subtle}` }}>
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: "14px",
+              display: "grid",
+              placeItems: "center",
+              backgroundColor: "rgba(124,77,43,0.10)",
+              border: `1px solid ${uiTokens.border.subtle}`,
+            }}
+          >
             <PersonIcon sx={{ color: uiTokens.color.accent, fontSize: 22 }} />
           </Box>
           <Box sx={{ flex: 1 }}>
-            <Typography sx={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: "1.15rem", color: uiTokens.color.ink, lineHeight: 1.05 }}>
+            <Typography
+              sx={{
+                fontFamily: "'Fraunces', serif",
+                fontWeight: 700,
+                fontSize: "1.15rem",
+                color: uiTokens.color.ink,
+                lineHeight: 1.05,
+              }}
+            >
               Admin login
             </Typography>
-            <Typography sx={{ mt: 0.4, fontSize: "0.82rem", color: uiTokens.color.soft }}>
+            <Typography
+              sx={{ mt: 0.4, fontSize: "0.82rem", color: uiTokens.color.soft }}
+            >
               Sign in to manage books.
             </Typography>
           </Box>
-          <IconButton size="small" onClick={handleDismiss} disabled={loading} sx={{ color: uiTokens.color.muted }}>
+          <IconButton
+            size="small"
+            onClick={handleDismiss}
+            disabled={loading}
+            sx={{ color: uiTokens.color.muted }}
+          >
             <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
-        <Box sx={{ px: { xs: 2, sm: 3 }, pt: 2.5, pb: 3, display: "flex", flexDirection: "column", gap: 2 }}>
-          <TextField label="Username" value={form.username} onChange={handleChange("username")} sx={inputSx} />
-          <TextField label="Password" type="password" value={form.password} onChange={handleChange("password")} sx={inputSx} />
-          {error && <Typography sx={{ fontSize: "0.82rem", color: uiTokens.color.danger }}>{error}</Typography>}
-          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.25, mt: 0.5 }}>
-            <Button onClick={handleDismiss} disabled={loading} sx={{ fontWeight: 800, color: uiTokens.color.muted, borderRadius: "12px" }}>
+        <Box
+          sx={{
+            px: { xs: 2, sm: 3 },
+            pt: 2.5,
+            pb: 3,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
+          <TextField
+            label="Username"
+            value={form.username}
+            onChange={handleChange("username")}
+            sx={inputSx}
+          />
+          <TextField
+            label="Password"
+            type="password"
+            value={form.password}
+            onChange={handleChange("password")}
+            sx={inputSx}
+          />
+          {error && (
+            <Typography
+              sx={{ fontSize: "0.82rem", color: uiTokens.color.danger }}
+            >
+              {error}
+            </Typography>
+          )}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: 1.25,
+              mt: 0.5,
+            }}
+          >
+            <Button
+              onClick={handleDismiss}
+              disabled={loading}
+              sx={{
+                fontWeight: 800,
+                color: uiTokens.color.muted,
+                borderRadius: "12px",
+              }}
+            >
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={loading} variant="contained" disableElevation sx={{ fontWeight: 800, borderRadius: "12px", background: "linear-gradient(135deg, #7c4d2b 0%, #9a6944 100%)", minWidth: 92 }}>
+            <Button
+              onClick={handleSubmit}
+              disabled={loading}
+              variant="contained"
+              disableElevation
+              sx={{
+                fontWeight: 800,
+                borderRadius: "12px",
+                background: "linear-gradient(135deg, #7c4d2b 0%, #9a6944 100%)",
+                minWidth: 92,
+              }}
+            >
               Login
             </Button>
           </Box>
