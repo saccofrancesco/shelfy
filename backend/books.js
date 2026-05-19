@@ -67,7 +67,14 @@ export function buildBooksFilter(query) {
 export function normalizeBookPayload(body, { partial = false } = {}) {
   const errors = {};
   const book = {};
-  const fields = ["title", "author", "year", "genre", "description", "coverUrl"];
+  const fields = [
+    "title",
+    "author",
+    "year",
+    "genre",
+    "description",
+    "coverUrl",
+  ];
   let sawAnyField = false;
 
   for (const field of fields) {
