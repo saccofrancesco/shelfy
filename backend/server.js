@@ -10,7 +10,8 @@ import {
 } from "./books.js";
 
 const PORT = Number(process.env.PORT ?? 3000);
-const ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_SECRET ?? "dev-access-secret";
+const ACCESS_TOKEN_SECRET =
+  process.env.JWT_ACCESS_SECRET ?? "dev-access-secret";
 const REFRESH_TOKEN_SECRET =
   process.env.JWT_REFRESH_SECRET ?? "dev-refresh-secret";
 const ACCESS_TOKEN_TTL = process.env.JWT_ACCESS_TTL ?? "15m";
@@ -100,7 +101,10 @@ app.post("/auth/login", async (req, res, next) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    const passwordOk = await bcrypt.compare(String(password), user.passwordHash);
+    const passwordOk = await bcrypt.compare(
+      String(password),
+      user.passwordHash,
+    );
     if (!passwordOk) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
